@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="机器学习分类 有监督学习：有带类标的训练数据来训练模型，模型用来预测不带类标的测试数据的output。 无监督学习：无训练数据，所有数据不带类标，目的学习出数据的结构、分布知识。 半监督学习：部分训练数据带类标，作为seed以得到其他点的类标或训练模型（偏有监督），或者学习出数据的结构、分布信息（偏无监督）。 ...">
+        <meta name="keywords" content="Machine Learning, Notes">
+        <link rel="icon" href="asdf/favicon.ico">
+
+        <title>PRML Introduction Note - Fingertap</title>
+
+        <!-- Stylesheets -->
+        <link href="asdf/theme/css/all.min.css" rel="stylesheet">
+        <!-- /Stylesheets -->
+
+        <!-- RSS Feeds -->
+        <link href="asdf/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Fingertap Full Atom Feed" />
+        <link href="asdf/feeds/prml-notes.atom.xml" type="application/atom+xml" rel="alternate" title="Fingertap Categories Atom Feed" />
+        <!-- /RSS Feeds -->
+
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+
+    </head>
+
+    <body>
+
+        <!-- Header -->
+    <div class="header-container gradient">
+
+            <!-- Static navbar -->
+            <div class="container">
+                <div class="header-nav">
+                    <div class="header-logo">
+                        <a herf="asdf/" class="pull-left"><img class="mr20" src="asdf/images/logo.gif" alt="logo"/></a>
+                        <a href="asdf/" class="pull-left">Fingertap</a>
+                    </div>
+                    <div class="nav pull-right">
+                            <a href="asdf/about.html">About</a>
+                            <a href="asdf/categories.html">Categories</a>
+                    </div>
+                </div>
+            </div>
+            <!-- /Static navbar -->
+
+            <!-- Header -->
+    <!-- Header -->
+    <div class="container header-wrapper">
+        <div class="row">
+              <div class="col-lg-12">
+                  <div class="header-content">
+                      <h1 class="header-title">PRML Introduction Note</h1>
+                      <p class="header-date">By <a href="asdf/author/han-zhang.html">Han Zhang</a>, 五 26 八月 2016, modified 五 26 八月 2016, in category <a href="asdf/category/prml-notes.html">Prml notes</a></p>
+                      <div class="clearfix"></div>
+                      <p class="pull-right header-tags">
+                          <span class="glyphicon glyphicon-tags mr5" aria-hidden="true"></span>
+<a href="asdf/tag/machine-learning.html">Machine Learning</a>, <a href="asdf/tag/notes.html">Notes</a>                      </p>
+                  </div>
+              </div>
+        </div>
+    </div>
+    <!-- /Header -->
+            <!-- /Header -->
+
+        </div>
+        <!-- /Header -->
+
+
+        <!-- Content -->
+    <div class="container content">
+        <h1>机器学习分类</h1>
+<ul>
+<li>有监督学习：有带类标的训练数据来训练模型，模型用来预测不带类标的测试数据的output。</li>
+<li>无监督学习：无训练数据，所有数据不带类标，目的学习出数据的结构、分布知识。</li>
+<li>半监督学习：部分训练数据带类标，作为seed以得到其他点的类标或训练模型（偏有监督），或者学习出数据的结构、分布信息（偏无监督）。</li>
+<li>强化学习：类似婴儿学步，通过反馈以优化模型。采取的输入为两种之一：exploration（探索新的action是否有好的结果）和exploitation（采取已知的可以得到好的结果的action）。</li>
+</ul>
+<h1>基本概率知识</h1>
+<h2>两法则</h2>
+<ul>
+<li>加法法则：联合分布（边缘化为）边缘分布。
+<div class="math">$$\int{P(x, y)}\text{d}x = P(y)$$</div>
+</li>
+<li>乘法法则：条件分布和边缘分布（乘积为）联合分布。
+<div class="math">$$P(x|y)P(y) = P(x, y)$$</div>
+</li>
+</ul>
+<h2>贝叶斯定理</h2>
+<div class="math">$$P(y|x) = \frac{P(x|y)P(y)}{P(x)}$$</div>
+<p>
+当输入一定时，<code>后验∝似然×先验</code>，因此后验可看做先验经过似然修正后的分布。若取共轭分布，则后验和先验具有相同的形式，可实现sequential learning，此时先验等价于一系列虚假的有效数据点。</p>
+<h2>期望</h2>
+<p>概率密度的范函，当概率密度函数确定时确定。
+</p>
+<div class="math">$$\mathbb{E}[f(x)]=\int f(x)P(x)\text{d}x$$</div>
+<p>
+条件期望、联合期望只是积分的概率密度不同：
+</p>
+<div class="math">$$\mathbb{E}[x|y]=\int xP(x|y)\text{d}x$$</div>
+<div class="math">$$\mathbb{E}_x[x,y]=\int xP(x, y)\text{d}x$$</div>
+<p>
+对于变量<span class="math">\(z = f(x, y)\)</span>，需要在<span class="math">\(x\)</span>、<span class="math">\(y\)</span>上积分：
+</p>
+<div class="math">\begin{split}
+\mathbb{E}[x+y]&amp;=\int\int{(x+y)P(x, y)}\text{d}x\text{d}y\\
+&amp;=\int\int xP(x|y)P(y)\text{d}x\text{d}y+\int\int yP(y|x)P(x)\text{d}y\text{d}x \\
+&amp;=\mathbb{E}[x|y]+\mathbb{E}[y|x]
+\end{split}</div>
+<h2>方差</h2>
+<p>概率密度的范函，当概率密度函数确定时确定。
+</p>
+<div class="math">\begin{split}
+\text{var}[x]&amp;=\mathbb{E}[(x-\mathbb{E}[x])^2]\\
+&amp;=\mathbb{E}[x^2-2\mathbb{E}[x]\cdot{x}+\mathbb{E}[x]^2]\\
+&amp;=\mathbb{E}[x^2]-\mathbb{E}[x]^2
+\end{split}</div>
+<p>
+两变量方差的和即可写作：
+</p>
+<div class="math">\begin{split}
+\text{var}[x+y]&amp;=\mathbb{E}[(x+y)^2]-\mathbb{E}[x+y]^2\\
+&amp;=\mathbb{E}[x^2|y]+2\mathbb{E}[xy]+\mathbb{E}[y^2|x]\\
+&amp;~~~-\mathbb{E}[x|y]^2-2\mathbb{E}[x|y]\mathbb{E}[y|x]-\mathbb{E}[y|x]^2\\
+&amp;=\text{var}[x|y]+\text{var}[y|x]+2(\mathbb{E}[xy]-\mathbb{E}[x|y]\mathbb{E}[y|x])
+\end{split}</div>
+<p>
+因此对于方差之和，存在交叉项。当变量相互独立时交叉项消失。</p>
+<h2>协方差</h2>
+<p>概率密度的范函，当概率密度函数确定时确定。
+</p>
+<div class="math">\begin{split}
+\text{cov}[x, y]&amp;=\mathbb{E}[(x-\mathbb{E}[x])(y-\mathbb{E}[y])]\\
+&amp;=\mathbb{E}[xy-\mathbb{E}[x]y-\mathbb{E}[y]x+\mathbb{E}[x]\mathbb{E}[y]]\\
+&amp;=\mathbb{E}[xy]-\mathbb{E}[x]\mathbb{E}[y]
+\end{split}</div>
+<h1>贝叶斯方法</h1>
+<h2>对模型参数的不同理解</h2>
+<ul>
+<li>频率学派：模型参数是固定的量，其值用“estimator”估计（如“likelihoo    d”）通过重复实验获取数据以逼近模型参数真实值。</li>
+<li>贝叶斯学派：模型参数是不确定量，其不确定性用先验分布描述，用实验数据（likelihood）来修正先验。</li>
+</ul>
+<h2>贝叶斯方法流程</h2>
+<ol>
+<li>写出似然函数 <span class="math">\(P(\mathcal{D}|\omega)\)</span>，求其最大值，得到最大似然估计(<span class="math">\(\omega_{MLE}\)</span>)。</li>
+<li>对参数引入先验 <span class="math">\(P(\omega)\)</span>，用贝叶斯公式得到后验概率 <span class="math">\(P(\omega|\mathcal{D})\propto P(\omega)P(\mathcal{D}|\omega)\)</span>，最大化后验概率得最大后验解(<span class="math">\(\omega_{MAP}\)</span>)。</li>
+<li>引入输出在参数下的条件分布<span class="math">\(P(y|\omega)\)</span>，利用贝叶斯公式得到输出和参数的联合概率<span class="math">\(P(y, \omega|\mathcal{D})=P(\omega|\mathcal{D})P(y|\omega)\)</span>，并对<span class="math">\(\omega\)</span>积分，得到预测分布<span class="math">\(P(y|\mathcal{D})\)</span>，至此没有参数<span class="math">\(\omega\)</span>，因此不会过拟合。</li>
+</ol>
+<h1>模型选择</h1>
+<p>两种思路：信息准则或交叉验证。</p>
+<h2>信息准则</h2>
+<p>加入正则化项惩罚过拟合的模型。</p>
+<ul>
+<li>缺点：对于AIC和BIC，若不顾参数的不确定性则会偏好过份简单的模型。</li>
+<li>优点：可以一次训练出需要的模型。</li>
+</ul>
+<h2>交叉验证</h2>
+<p>用部分数据集作为训练集，另一部分作为测试集，多次训练，找到在测试集上泛化能力最好的模型。</p>
+<ul>
+<li>优点：对简单模型和复杂模型无偏好。</li>
+<li>缺点：1）有多个参数需要组合观察效果时需要指数级的运行次数；2）折数多时训练成本很大。</li>
+</ul>
+<h1>决策论</h1>
+<h2>损失函数</h2>
+<p>损失函数是给定的，损失区域（损失函数的积分区域）是不定的。若是最小期望损失，则是积分较低的类后验概率与变量轴围成的区域。</p>
+<p>对于离散值：
+</p>
+<div class="math">$$\mathbb{E}[L]=\sum_k\sum_j\int_{\mathcal{R}_j}L_{kj}P(\mathbf{x}, \mathcal{C}_k)\text{d}\mathbf{x}$$</div>
+<p>
+对于连续值：
+</p>
+<div class="math">$$\mathbb{E}[L]=\int\int L(t, y(\mathbf{x}))P(\mathbf{x}, t)\text{d}\mathbf{x}\text{d}t$$</div>
+<p>
+利用损失函数的一般形式可以计算一些一般意义上的损失界问题。</p>
+<h2>判别函数、判别模型、生成模型</h2>
+<ul>
+<li>生成模型：对输入或输出建模。先估计参数，再通过<code>似然×先验</code>的形式得到后验概率。</li>
+<li>判别模型：直接对后验分布建模。</li>
+<li>判别函数：从输入到输出的一个哈希函数，直接完成推断和决策过程。</li>
+</ul>
+<p>生成模型和判别模型因为只完成推断（估计后验概率），因此决策方式可以自由修改，而判别函数需要随着决策方式的修改而不断重新学习。</p>
+<p>生成模型因为要多估计参数，因此相较判别模型更浪费计算资源，但是可以做离群点检测。</p>
+<p>计算后验概率有助于：</p>
+<ul>
+<li>利用后验概率确定拒绝选项的标准</li>
+<li>补偿先验概率（人造平衡数据集进行学习模型后，对“平衡”这一假设进行补偿）：
+<div class="math">$$\frac{平衡后验}{平衡先验}\times实际先验=实际后验$$</div>
+</li>
+<li>利用独立性学习组合模型</li>
+</ul>
+<h1>信息论</h1>
+<p><strong>熵</strong>是信息量 <span class="math">\(\log{P(x)}\)</span> 的负期望，为概率密度函数的范函，衡量变量所提供信息量的多少：
+</p>
+<div class="math">$$\text{H}[x] = -\int P(x)\log{P(x)}\text{d}x$$</div>
+<p>
+<strong>KL散度</strong>是相对信息量 <span class="math">\(\log{\frac{P(y)}{P(x}}\)</span> 的负期望，为概率密度的范函，衡量两个分布的差距，非负：
+</p>
+<div class="math">$$\text{KL}(P(x)||P(y))=-\int P(x)\log \frac{P(y)}{P(x)}\text{d}x$$</div>
+<p>
+<strong>互信息</strong>是一个KL散度，衡量变量的独立程度：
+</p>
+<div class="math">$$\text{I}[x, y] = \text{KL}(P(x, y)||P(x)P(y))$$</div>
+<p>
+联系（由定义可证）：
+</p>
+<div class="math">$$
+\text{H}[x,y]=\text{H}[x] + \text{H}[y|x] = \text{H}[y] + \text{H}[x|y]
+$$</div>
+<div class="math">$$\text{I}[x, y] =\text{H}[y]-\text{H}[y|x]=\text{H}[x]-\text{H}[x|y]$$</div>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+    
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+
+          <div class="comments">
+            <h1>Comments</h1>
+            <div class="ds-thread"></div>
+            <script type="text/javascript">
+                var duoshuoQuery = {short_name:"fingertap"};
+          (function() {
+           var ds = document.createElement('script');
+           ds.type = 'text/javascript';ds.async = true;
+           ds.src = 'http://static.duoshuo.com/embed.js';
+           ds.charset = 'UTF-8';
+           (document.getElementsByTagName('head')[0]
+            || document.getElementsByTagName('body')[0]).appendChild(ds);
+           })();
+          </script>
+          <noscript>Please enable JavaScript to view the comments.</noscript>
+        </div>
+        <!-- Duoshuo Comment END -->
+    </div>
+        <!-- /Content --> 
+
+        <!-- Footer -->
+        <div class="footer gradient-2">
+            <div class="container footer-container ">
+                <div class="row">
+                    <div class="col-xs-4 col-sm-3 col-md-3 col-lg-3">
+                        <div class="footer-title">Sitemap</div>
+                        <ul class="list-unstyled">
+                            <li><a href="asdf/archives.html">Archives</a></li>
+                            <li><a href="asdf/tags.html">Tags</a></li>
+                            <li><a href="asdf/authors.html">Authors</a></li>
+                            <li><a href="asdf/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">Atom Feed</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-4 col-sm-3 col-md-3 col-lg-3">
+                    </div>
+                    <div class="col-xs-4 col-sm-3 col-md-3 col-lg-3">
+                    </div> 
+                    <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                        <p class="pull-right text-right">
+                            <small>&copy; Copyright 2015, Fingertap.</small>
+                            <small><em>Created using <a href="http://docs.getpelican.com/" target="_blank">pelican</a></em></small><br/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /Footer -->
+    </body>
+</html>

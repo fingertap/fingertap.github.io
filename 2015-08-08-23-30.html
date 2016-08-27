@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="我用到的Markdown语法 Markdown是一种便于上手的排版语言，并且最大的优点之一是它的源码也具有很高的可读性。这里总结的是我在写博客时会用到的一些markdown语法，便于遗忘的时候查阅。 标题 在markdown中，用多个“#+文字”可得到需要一至六级标题： # 一级标题 ## 二级标题 ### 三级标题 #### 四级标题 ##### 五级标题 ###### 六级标题 效果为 ...">
+        <meta name="keywords" content="常用技巧">
+        <link rel="icon" href="asdf/favicon.ico">
+
+        <title>我用到的Markdown语法 - Fingertap</title>
+
+        <!-- Stylesheets -->
+        <link href="asdf/theme/css/all.min.css" rel="stylesheet">
+        <!-- /Stylesheets -->
+
+        <!-- RSS Feeds -->
+        <link href="asdf/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Fingertap Full Atom Feed" />
+        <link href="asdf/feeds/bei-wang.atom.xml" type="application/atom+xml" rel="alternate" title="Fingertap Categories Atom Feed" />
+        <!-- /RSS Feeds -->
+
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+
+    </head>
+
+    <body>
+
+        <!-- Header -->
+    <div class="header-container gradient">
+
+            <!-- Static navbar -->
+            <div class="container">
+                <div class="header-nav">
+                    <div class="header-logo">
+                        <a herf="asdf/" class="pull-left"><img class="mr20" src="asdf/images/logo.gif" alt="logo"/></a>
+                        <a href="asdf/" class="pull-left">Fingertap</a>
+                    </div>
+                    <div class="nav pull-right">
+                            <a href="asdf/about.html">About</a>
+                            <a href="asdf/categories.html">Categories</a>
+                    </div>
+                </div>
+            </div>
+            <!-- /Static navbar -->
+
+            <!-- Header -->
+    <!-- Header -->
+    <div class="container header-wrapper">
+        <div class="row">
+              <div class="col-lg-12">
+                  <div class="header-content">
+                      <h1 class="header-title">我用到的Markdown语法</h1>
+                      <p class="header-date">By <a href="asdf/author/aaron.html">Aaron</a>, 六 08 八月 2015, modified 六 08 八月 2015, in category <a href="asdf/category/bei-wang.html">备忘</a></p>
+                      <div class="clearfix"></div>
+                      <p class="pull-right header-tags">
+                          <span class="glyphicon glyphicon-tags mr5" aria-hidden="true"></span>
+<a href="asdf/tag/chang-yong-ji-qiao.html">常用技巧</a>                      </p>
+                  </div>
+              </div>
+        </div>
+    </div>
+    <!-- /Header -->
+            <!-- /Header -->
+
+        </div>
+        <!-- /Header -->
+
+
+        <!-- Content -->
+    <div class="container content">
+        <h1>我用到的Markdown语法</h1>
+<p>Markdown是一种便于上手的排版语言，并且最大的优点之一是它的源码也具有很高的可读性。这里总结的是我在写博客时会用到的一些markdown语法，便于遗忘的时候查阅。</p>
+<h2>标题</h2>
+<p>在markdown中，用多个“<code>#</code>+文字”可得到需要一至六级标题：</p>
+<div class="highlight"><pre><span></span># 一级标题
+## 二级标题
+### 三级标题
+#### 四级标题
+##### 五级标题
+###### 六级标题
+</pre></div>
+
+
+<p>效果为</p>
+<blockquote>
+<h1>一级标题</h1>
+<h2>二级标题</h2>
+<h3>三级标题</h3>
+<h4>四级标题</h4>
+<h5>五级标题</h5>
+<h6>六级标题</h6>
+</blockquote>
+<p>为了代码美观，可以用<code>#</code>封闭标题，就像<code>## 二级标题 ##</code>，这样，效果完全一样。</p>
+<h2>字体形式</h2>
+<p>在Markdown中，用一个<code>*</code>包含文本即为斜体，用两个<code>*</code>包含即为粗体：</p>
+<div class="highlight"><pre><span></span>*This is italic form*
+**这是粗体**
+</pre></div>
+
+
+<p>得到的效果是：</p>
+<blockquote>
+<p><em>This is italic form</em>
+<strong>这是粗体</strong></p>
+</blockquote>
+<h2>列表</h2>
+<p>列表环境在写作中也时常用到，在markdown中列表环境十分简单，分为有序和无序。有序的用<code>1.</code>开头，无序用<code>-</code>开头，和内容中间保留一个空格，就像这样：</p>
+<div class="highlight"><pre><span></span>- 这是
+- 一个
+- 无序
+- 列表
+
+1. 这是
+2. 一个
+3. 有序
+4. 列表
+</pre></div>
+
+
+<p>得到的效果是：</p>
+<blockquote>
+<ul>
+<li>这是</li>
+<li>一个</li>
+<li>无序</li>
+<li>列表</li>
+</ul>
+</blockquote>
+<p>和</p>
+<blockquote>
+<ol>
+<li>这是</li>
+<li>一个</li>
+<li>有序</li>
+<li>列表</li>
+</ol>
+</blockquote>
+<h2>链接和图片</h2>
+<p>链接在markdown中只用<code>[显示的文本](链接地址)</code>即可，就像这样：</p>
+<div class="highlight"><pre><span></span>[Fingertap](http://fingertap.github.io)
+</pre></div>
+
+
+<p>插入图片就是在链接语法前加上<code>!</code>，<code>[]</code>中的是替代文字。</p>
+<div class="highlight"><pre><span></span>![天安门](http://tralvel.superlife.ca/files/tiananmen-square-2024x768.jpg)
+</pre></div>
+
+
+<h2>引用和代码</h2>
+<p>在markdown中要引用他人的文字，只需要在引用内容前加上<code>&gt;</code>就好了。</p>
+<div class="highlight"><pre><span></span>&gt;这是一条引用
+</pre></div>
+
+
+<p>然后效果会是:</p>
+<blockquote>
+<p>这是一条引用</p>
+</blockquote>
+<p>直接在markdown中插入小段代码用`包含起来即可，大段代码要用三个`包含，在三个`后加上identifier，如python，则可以显示特定的语言的语法高亮。</p>
+<h2>数学公式</h2>
+<p>利用mathjax支持，可以在markdown里自由书写公式，短的公式用<code>$</code>包含即可，大段公式用两个<code>$</code>头尾包含即可，里面即可用我们熟悉的latex语法了。</p>
+<div class="highlight"><pre><span></span>$c^2 = a^2 + b^2$
+
+$$ e^{i\pi} + 1 = 0 $$
+</pre></div>
+
+
+<p>效果为</p>
+<blockquote>
+<p><span class="math">\(c^2 = a^2 + b^2\)</span>
+<div class="math">$$ e^{i\pi} + 1 = 0 $$</div>
+</p>
+</blockquote>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+    
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+
+          <div class="comments">
+            <h1>Comments</h1>
+            <div class="ds-thread"></div>
+            <script type="text/javascript">
+                var duoshuoQuery = {short_name:"fingertap"};
+          (function() {
+           var ds = document.createElement('script');
+           ds.type = 'text/javascript';ds.async = true;
+           ds.src = 'http://static.duoshuo.com/embed.js';
+           ds.charset = 'UTF-8';
+           (document.getElementsByTagName('head')[0]
+            || document.getElementsByTagName('body')[0]).appendChild(ds);
+           })();
+          </script>
+          <noscript>Please enable JavaScript to view the comments.</noscript>
+        </div>
+        <!-- Duoshuo Comment END -->
+    </div>
+        <!-- /Content --> 
+
+        <!-- Footer -->
+        <div class="footer gradient-2">
+            <div class="container footer-container ">
+                <div class="row">
+                    <div class="col-xs-4 col-sm-3 col-md-3 col-lg-3">
+                        <div class="footer-title">Sitemap</div>
+                        <ul class="list-unstyled">
+                            <li><a href="asdf/archives.html">Archives</a></li>
+                            <li><a href="asdf/tags.html">Tags</a></li>
+                            <li><a href="asdf/authors.html">Authors</a></li>
+                            <li><a href="asdf/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">Atom Feed</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-4 col-sm-3 col-md-3 col-lg-3">
+                    </div>
+                    <div class="col-xs-4 col-sm-3 col-md-3 col-lg-3">
+                    </div> 
+                    <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                        <p class="pull-right text-right">
+                            <small>&copy; Copyright 2015, Fingertap.</small>
+                            <small><em>Created using <a href="http://docs.getpelican.com/" target="_blank">pelican</a></em></small><br/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /Footer -->
+    </body>
+</html>

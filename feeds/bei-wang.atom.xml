@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Fingertap</title><link href="asdf/" rel="alternate"></link><link href="asdf/feeds/bei-wang.atom.xml" rel="self"></link><id>asdf/</id><updated>2015-08-08T23:29:00+08:00</updated><entry><title>我用到的Markdown语法</title><link href="asdf/2015-08-08-23-30.html" rel="alternate"></link><published>2015-08-08T23:29:00+08:00</published><author><name>Aaron</name></author><id>tag:,2015-08-08:asdf/2015-08-08-23-30.html</id><summary type="html">&lt;h1&gt;我用到的Markdown语法&lt;/h1&gt;
+&lt;p&gt;Markdown是一种便于上手的排版语言，并且最大的优点之一是它的源码也具有很高的可读性。这里总结的是我在写博客时会用到的一些markdown语法，便于遗忘的时候查阅。&lt;/p&gt;
+&lt;h2&gt;标题&lt;/h2&gt;
+&lt;p&gt;在markdown中，用多个“&lt;code&gt;#&lt;/code&gt;+文字”可得到需要一至六级标题：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# 一级标题
+## 二级标题
+### 三级标题
+#### 四级标题
+##### 五级标题
+###### 六级标题
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;效果为&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;h1&gt;一级标题&lt;/h1&gt;
+&lt;h2&gt;二级标题&lt;/h2&gt;
+&lt;h3&gt;三级标题&lt;/h3&gt;
+&lt;h4&gt;四级标题&lt;/h4&gt;
+&lt;h5&gt;五级标题&lt;/h5&gt;
+&lt;h6&gt;六级标题&lt;/h6&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;为了代码美观，可以用&lt;code&gt;#&lt;/code&gt;封闭标题，就像&lt;code&gt;## 二级标题 ##&lt;/code&gt;，这样，效果完全一样。&lt;/p&gt;
+&lt;h2&gt;字体形式&lt;/h2&gt;
+&lt;p&gt;在Markdown中，用一个&lt;code&gt;*&lt;/code&gt;包含文本即为斜体，用两个&lt;code&gt;*&lt;/code&gt;包含即为粗体：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;*This is italic form*
+**这是粗体**
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;得到的效果是：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;em&gt;This is italic form&lt;/em&gt;
+&lt;strong&gt;这是粗体&lt;/strong&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2&gt;列表&lt;/h2&gt;
+&lt;p&gt;列表环境在写作中也时常用到，在markdown中列表环境十分简单，分为有序和无序。有序的用&lt;code&gt;1.&lt;/code&gt;开头，无序用&lt;code&gt;-&lt;/code&gt;开头，和内容中间保留一个空格，就像这样：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;- 这是
+- 一个
+- 无序
+- 列表
+
+1. 这是
+2. 一个
+3. 有序
+4. 列表
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;得到的效果是：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;这是&lt;/li&gt;
+&lt;li&gt;一个&lt;/li&gt;
+&lt;li&gt;无序&lt;/li&gt;
+&lt;li&gt;列表&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;和&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;这是&lt;/li&gt;
+&lt;li&gt;一个&lt;/li&gt;
+&lt;li&gt;有序&lt;/li&gt;
+&lt;li&gt;列表&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;h2&gt;链接和图片&lt;/h2&gt;
+&lt;p&gt;链接在markdown中只用&lt;code&gt;[显示的文本](链接地址)&lt;/code&gt;即可，就像这样：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;[Fingertap](http://fingertap.github.io)
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;插入图片就是在链接语法前加上&lt;code&gt;!&lt;/code&gt;，&lt;code&gt;[]&lt;/code&gt;中的是替代文字。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;![天安门](http://tralvel.superlife.ca/files/tiananmen-square-2024x768.jpg)
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;引用和代码&lt;/h2&gt;
+&lt;p&gt;在markdown中要引用他人的文字，只需要在引用内容前加上&lt;code&gt;&amp;gt;&lt;/code&gt;就好了。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&amp;gt;这是一条引用
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;然后效果会是:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;这是一条引用&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;直接在markdown中插入小段代码用`包含起来即可，大段代码要用三个`包含，在三个`后加上identifier，如python，则可以显示特定的语言的语法高亮。&lt;/p&gt;
+&lt;h2&gt;数学公式&lt;/h2&gt;
+&lt;p&gt;利用mathjax支持，可以在markdown里自由书写公式，短的公式用&lt;code&gt;$&lt;/code&gt;包含即可，大段公式用两个&lt;code&gt;$&lt;/code&gt;头尾包含即可，里面即可用我们熟悉的latex语法了。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$c^2 = a^2 + b^2$
+
+$$ e^{i\pi} + 1 = 0 $$
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;效果为&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;span class="math"&gt;\(c^2 = a^2 + b^2\)&lt;/span&gt;
+&lt;div class="math"&gt;$$ e^{i\pi} + 1 = 0 $$&lt;/div&gt;
+&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+    
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</summary><category term="常用技巧"></category></entry></feed>

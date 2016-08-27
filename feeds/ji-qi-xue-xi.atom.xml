@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Fingertap</title><link href="asdf/" rel="alternate"></link><link href="asdf/feeds/ji-qi-xue-xi.atom.xml" rel="self"></link><id>asdf/</id><updated>2015-08-19T19:15:00+08:00</updated><entry><title>高斯分布总结</title><link href="asdf/2015-08-19-19-16.html" rel="alternate"></link><published>2015-08-19T19:15:00+08:00</published><author><name>Aaron</name></author><id>tag:,2015-08-19:asdf/2015-08-19-19-16.html</id><summary type="html">&lt;h1&gt;高斯分布总结&lt;/h1&gt;
+&lt;p&gt;高斯分布的历史背景我就不赘述了，这篇文章主要是想记下来我在学习高斯分布中遇到的所有的问题，并且做一个总结，更好地掌握高斯分布的性质，目的是从计算推导的角度帮助理解高斯分布。这篇文章绝大部分基于PRML。&lt;/p&gt;
+&lt;p&gt;首先，高斯分布的单维形式，也即变量是&lt;span class="math"&gt;\(\mathbb{R}^{1\times{1}}\)&lt;/span&gt;时，表示为&lt;/p&gt;
+&lt;div class="math"&gt;$$
+\begin{equation}
+\mathcal{N}(x|\mu ,\sigma^2) = \frac{1}{(2\pi\sigma^2)^{1/2}}\exp\bigg\{-\frac{1}{2\sigma^2}(x-\mu)^2\bigg\}
+\end{equation}
+$$&lt;/div&gt;
+&lt;p&gt;其中，&lt;span class="math"&gt;\(\sigma\)&lt;/span&gt;是方差，而&lt;span class="math"&gt;\(\mu\)&lt;/span&gt;代表均值。而其多维形式，也即变量是一个&lt;span class="math"&gt;\(\mathbb{R}^{D\times{1}}\)&lt;/span&gt;列向量时，表示为&lt;/p&gt;
+&lt;div class="math"&gt;$$
+\begin{equation}
+\mathcal{N}(\mathbf{x}|\boldsymbol{\mu},\boldsymbol{\Sigma})=\frac{1}{(2\pi)^{D/2}}\frac{1}{|\boldsymbol{\Sigma}|^{1/2}}\exp\bigg\{-\frac{1}{2}(\mathbf{x}-\boldsymbol\mu)^T\boldsymbol{\Sigma}^{-1}(\mathbf{x}-\boldsymbol\mu)\bigg\}
+\end{equation}
+$$&lt;/div&gt;
+&lt;p&gt;其中&lt;span class="math"&gt;\(\boldsymbol{\Sigma}\)&lt;/span&gt;是&lt;span class="math"&gt;\(\mathbf{x}\)&lt;/span&gt;的协方差矩阵，总是对称的，&lt;span class="math"&gt;\(\boldsymbol{\mu}\)&lt;/span&gt;是均值向量。&lt;/p&gt;
+&lt;p&gt;多维高斯分布是由多个独立高斯分布乘积所得，描述了一个&lt;span class="math"&gt;\(D\)&lt;/span&gt;维空间中的高斯分布。&lt;/p&gt;
+&lt;h2&gt;单维高斯分布基本性质&lt;/h2&gt;
+&lt;p&gt;这一节总结一下高斯分布的基本性质以及计算方法。&lt;/p&gt;
+&lt;h3&gt;概率分布基本性质&lt;/h3&gt;
+&lt;p&gt;作为合理概率分布，高斯分布在定义域内积分为1且恒正。&lt;/p&gt;
+&lt;div class="math"&gt;$$
+\begin{equation}
+\begin{aligned}
+\int_{-\infty}^{+\infty}\mathcal{N}(x|\mu ,\sigma^2)
+&amp;amp;= \frac{1}{(2\pi\sigma^2)^{1/2}}\int_{-\infty}^{+\infty}{\exp\bigg\{-\frac{x}{2\sigma^2}\bigg\}\mathrm{d}x}\\
+&amp;amp;= \frac{1}{\sqrt{\pi}}\int_{-\infty}^{+\infty}{e^{-u^2}\mathrm{d}u} \\
+&amp;amp;= \frac{1}{\sqrt{\pi}}\sqrt{\int_{-\infty}^{+\infty}\int_{-\infty}^{+\infty}e^{-x^2-y^2}\mathrm{d}x\mathrm{d}y} \\
+&amp;amp;= \frac{1}{\sqrt{\pi}}\sqrt{\int_{0}^{2\pi}\mathrm{d}\theta\int_{0}^{\infty}r\cdot{e^{-r^2}}\mathrm{d}r} \\
+&amp;amp;= 1
+\end{aligned}
+\end{equation}
+$$&lt;/div&gt;
+&lt;p&gt;因为是指数函数，因此概率恒为正。&lt;/p&gt;
+&lt;h3&gt;期望和方差&lt;/h3&gt;
+&lt;p&gt;高斯分布的期望为&lt;span class="math"&gt;\(\mu\)&lt;/span&gt;，在计算的过程中利用奇函数部分积分为零。&lt;/p&gt;
+&lt;div class="math"&gt;$$
+\begin{equation}
+\begin{aligned}
+\mathbb{E}[x] &amp;amp;= \int_{-\infty}^{+\infty}\mathcal{N}(x|\mu ,\sigma^2)x\mathrm{d}x \\
+&amp;amp;= \mu\int_{-\infty}^{+\infty}\mathcal{N}(x|\mu ,\sigma^2)\mathrm{d}x + \int_{-\infty}^{+\infty} x\cdot{\frac{1}{(2\pi\sigma^2)^{1/2}}\exp\big\{-\frac{x^2}{2\sigma^2}\big\}}\mathrm{d}x \\
+&amp;amp;= \mu + 0 \\
+&amp;amp;= \mu
+\end{aligned}
+\end{equation}
+$$&lt;/div&gt;
+&lt;p&gt;高斯分布的方差为&lt;span class="math"&gt;\(\sigma\)&lt;/span&gt;，在计算的过程中同样利用到了奇偶性，首先看二阶矩&lt;/p&gt;
+&lt;div class="math"&gt;$$
+\begin{equation}
+\begin{aligned}
+\mathbb{E}[x^2] &amp;amp;= \mu^2 + \int_{-\infty}^{+\infty}\frac{1}{(2\pi\sigma^2)^{1/2}}\exp\big\{-\frac{x^2}{2\sigma^2}\big\} \\ 
+&amp;amp;\ + 2\mu\cdot{\int_{-\infty}^{+\infty}x\cdot{\frac{1}{(2\pi\sigma^2)^{1/2}}\exp\big\{-\frac{x^2}{2\sigma^2}\big\}}}\\
+&amp;amp;= \mu^2 + \sigma^2 + 0 \\
+&amp;amp;= \mu^2 + \sigma^2
+\end{aligned}
+\end{equation}
+$$&lt;/div&gt;
+&lt;p&gt;得到二阶矩以后，方差很容易求得&lt;/p&gt;
+&lt;div class="math"&gt;$$
+\begin{equation}
+\text{var}[x] = \mathbb{E}[x^2]-\mathbb{E}[x]^2=\sigma^2
+\end{equation}
+$$&lt;/div&gt;
+&lt;h2&gt;单维和多维高斯分布之间的关系&lt;/h2&gt;
+&lt;p&gt;多维高斯分布和单维高斯分布之间，因为不同变量间的独立性，其实是乘积的关系。多维高斯分布的公式其实是多组独立的满足高斯分布的变量的乘积利用协方差矩阵经过化简以后得到的结果。&lt;/p&gt;
+&lt;p&gt;暂时不管指数函数的系数，它们起到的作用仅仅是归一化。首先观察多维高斯分布的指数部分&lt;/p&gt;
+&lt;div class="math"&gt;$$
+\begin{equation}
+\Delta^2 = (\mathbf{x}-\boldsymbol\mu)^T\boldsymbol{\Sigma}^{-1}(\mathbf{x}-\boldsymbol\mu)
+\end{equation}
+$$&lt;/div&gt;
+&lt;p&gt;这里的&lt;span class="math"&gt;\(\Delta\)&lt;/span&gt;是马氏距离，其中&lt;span class="math"&gt;\(\boldsymbol{\Sigma}\)&lt;/span&gt;为单位矩阵时马氏距离退化为欧氏距离。&lt;/p&gt;
+&lt;p&gt;协方差矩阵&lt;span class="math"&gt;\(\boldsymbol{\Sigma}\)&lt;/span&gt;根据协方差定义为实对称矩阵，取&lt;span class="math"&gt;\(\boldsymbol{\Sigma}\)&lt;/span&gt;的单位正交特征向量集&lt;span class="math"&gt;\(\mathbf{u}_i\)&lt;/span&gt;有&lt;/p&gt;
+&lt;div class="math"&gt;$$
+\begin{equation}
+\boldsymbol{\Sigma}\mathbf{u}_i = \lambda{}_i\mathbf{u}_i
+\end{equation}
+$$&lt;/div&gt;
+&lt;p&gt;其中&lt;span class="math"&gt;\(\lambda{}_i\)&lt;/span&gt;为对应的特征值。&lt;/p&gt;
+&lt;p&gt;用特征分解表示协方差矩阵我们有&lt;/p&gt;
+&lt;div class="math"&gt;$$
+\begin{equation}
+\begin{aligned}
+\boldsymbol{\Sigma}
+&amp;amp;= \mathbf{U}\boldsymbol{\Lambda}\mathbf{U}^T \\
+&amp;amp;=\sum_{i=1}^{D}\lambda{}_i\mathbf{u}_i\mathbf{u}_i^T \\
+\end{aligned}
+\end{equation}
+$$&lt;/div&gt;
+&lt;p&gt;其逆矩阵的特征值为原矩阵的倒数，而  &lt;/p&gt;
+&lt;div class="math"&gt;$$
+\begin{equation}
+\begin{aligned}
+\boldsymbol{\Sigma}^{-1} &amp;amp;= (\mathbf{U}\boldsymbol{\Lambda}\mathbf{U}^T)^{-1} \\
+&amp;amp;= (\mathbf{U}^T)^{-1}\boldsymbol{\Lambda}^{-1}\mathbf{U}^{-1} \\
+&amp;amp;= \mathbf{U}\boldsymbol{\Lambda}^{-1}\mathbf{U}^T \\
+&amp;amp;=\sum_{i=1}^{D}\frac{1}{\lambda{}_i}\mathbf{u}_i\mathbf{u}_i^T \\
+\end{aligned}
+\end{equation}
+$$&lt;/div&gt;
+&lt;p&gt;带入(7)中有&lt;/p&gt;
+&lt;div class="math"&gt;$$
+\begin{equation}
+\begin{aligned}
+\Delta^2 &amp;amp;= (\mathbf{x}-\boldsymbol\mu)^T\sum_{i=1}^{D}\frac{1}{lambda_i}\mathbf{u}_i\mathbf{u}_i^T(\mathbf{x}-\boldsymbol\mu) \\
+&amp;amp;= \sum_{i=1}^D\frac{y_i^2}{\lambda_i}
+\end{aligned}
+\end{equation}
+$$&lt;/div&gt;
+&lt;p&gt;其中， &lt;span class="math"&gt;\(y_i = \mathbf{u}_i^T(\mathbf{x}-\boldsymbol{\mu})\)&lt;/span&gt;。&lt;/p&gt;
+&lt;p&gt;现在其实已经将多维高斯分布转化为了单维高斯分布，归一化系数因为我们并没有将指数中的项提出，会仍然成立。这时我们的高斯分布是多个高斯分布的乘积（因为这里&lt;span class="math"&gt;\(y\)&lt;/span&gt;项在指数中求和）。&lt;/p&gt;
+&lt;p&gt;而我们有&lt;span class="math"&gt;\(\boldsymbol{|\Sigma}| = \prod_{j=1}^D\lambda_j\)&lt;/span&gt;，因此&lt;span class="math"&gt;\(\boldsymbol{|\Sigma}|^{1/2} = \prod_{j=1}^D\lambda_j^{1/2}\)&lt;/span&gt;。因此，最终我们可以将前面的归一化系数也重写&lt;/p&gt;
+&lt;div class="math"&gt;$$
+\begin{equation}
+\begin{aligned}
+\mathcal{N}(\mathbf{x}|\boldsymbol{\mu},\boldsymbol{\Sigma})
+= \prod_{j=1}^D\frac{1}{(2\pi\lambda_j)^{1/2}}\exp{-\frac{y_j^2}{2\lambda_j}}
+\end{aligned}
+\end{equation}
+$$&lt;/div&gt;
+&lt;p&gt;这一组独立高斯分布的方差为&lt;span class="math"&gt;\(\sqrt{\lambda_j}\)&lt;/span&gt;，均值为0。其乘积即为多维高斯分布。&lt;/p&gt;
+&lt;h2&gt;条件高斯分布和边缘高斯分布&lt;/h2&gt;
+&lt;p&gt;对于多维高斯分布，若固定一部分变量&lt;span class="math"&gt;\(\mathbf{x}_b\)&lt;/span&gt;，另一部分变量&lt;span class="math"&gt;\(\mathbf{x}_a\)&lt;/span&gt;仍然满足高斯分布，这个高斯分布即是条件高斯分布&lt;span class="math"&gt;\(p_{a|b}\)&lt;/span&gt;。而对多维高斯分布中的一部分变量&lt;span class="math"&gt;\(\mathbf{x}_b\)&lt;/span&gt;进行归一化从而得到另一部分&lt;span class="math"&gt;\(\mathbf{x}_a\)&lt;/span&gt;的边缘分布也满足高斯分布，这个高斯分布即为边缘高斯分布&lt;span class="math"&gt;\(p_a\)&lt;/span&gt;。边缘高斯分布和条件高斯分布的推导都涉及到分块矩阵的二次型问题，因为满足分配率所以推导繁琐但不复杂，因此略去。只需要注意到所利用的性质是协方差矩阵和其逆矩阵&lt;em&gt;precision matrix&lt;/em&gt; &lt;span class="math"&gt;\(\boldsymbol\Lambda\)&lt;/span&gt;都是对称矩阵，所以二次型中前后向量交换是等价的。&lt;/p&gt;
+&lt;p&gt;直接给出条件高斯分布和边缘高斯分布的结果。给定一个联合高斯分布&lt;span class="math"&gt;\(\mathcal{N}(\mathbf{x}|\boldsymbol{\mu}, \boldsymbol{\Sigma})\)&lt;/span&gt;，并且记&lt;span class="math"&gt;\(\boldsymbol{\Lambda} = \boldsymbol{\Sigma}^{-1}\)&lt;/span&gt;，且有&lt;/p&gt;
+&lt;div class="math"&gt;$$
+\begin{equation}
+\mathbf{x} = 
+\left(
+\begin{array}{c}
+\mathbf{x}_a \\
+\mathbf{x}_b \\
+\end{array}
+\right),
+\boldsymbol{\mu} = 
+\left(
+\begin{array}{c}
+\boldsymbol{\mu}_a \\
+\boldsymbol{\mu}_b \\
+\end{array}
+\right)
+\end{equation}
+$$&lt;/div&gt;
+&lt;div class="math"&gt;$$
+\begin{equation}
+\boldsymbol{\Sigma}=
+\left(
+\begin{array}{cc}
+&amp;amp;\boldsymbol{\Sigma}_{aa} &amp;amp;\boldsymbol{\Sigma}_{ab} \\
+&amp;amp;\boldsymbol{\Sigma}_{ba} &amp;amp;\boldsymbol{\Sigma}_{bb} \\
+\end{array}
+\right),
+\boldsymbol{\Lambda}=
+\left(
+\begin{array}{cc}
+\boldsymbol{\Lambda}_{aa} &amp;amp;\boldsymbol{\Lambda}_{ab} \\
+\boldsymbol{\Lambda}_{ba} &amp;amp;\boldsymbol{\Lambda}_{bb} \\
+\end{array}
+\right)
+\end{equation}
+$$&lt;/div&gt;
+&lt;p&gt;条件分布即为：&lt;/p&gt;
+&lt;div class="math"&gt;$$
+\begin{equation}
+p(\mathbf{x}_a|\mathbf{x}_b) = \mathcal{N}(\mathbf{x}_a|\boldsymbol{\mu}_{a|b}, \boldsymbol{\Lambda_aa}^-1)
+\end{equation}
+$$&lt;/div&gt;
+&lt;div class="math"&gt;$$
+\begin{equation}
+\boldsymbol{\mu}_{a|b} = \boldsymbol{\mu}_a - \boldsymbol{\Lambda}_{aa}
+\end{equation}
+$$&lt;/div&gt;
+&lt;p&gt;边缘概率分布即为：
+&lt;/p&gt;
+&lt;div class="math"&gt;$$
+\begin{equation}
+p(\mathbf{x}-a) = \mathcal{N}(\mathbf{x}_a|\boldsymbol{\mu}_a, \boldsymbol{\Sigma}_{aa})
+\end{equation}
+$$&lt;/div&gt;
+&lt;p&gt;这里用PRML中的图来帮助定性的理解。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="条件高斯分布和边缘高斯分布" src="/images/PRML2-9.png" /&gt;&lt;/p&gt;
+&lt;p&gt;上图中左边两个变量上的高斯概率分布&lt;span class="math"&gt;\(p(x_a, x_b)\)&lt;/span&gt;的等高线轮廓线，右边蓝色曲线是边缘概率分布&lt;span class="math"&gt;\(p(x_a)\)&lt;/span&gt;，红色曲线&lt;span class="math"&gt;\(x_b=0.7\)&lt;/span&gt;的条件概率分布&lt;span class="math"&gt;\(p(x_a|x_b)\)&lt;/span&gt;。边缘概率分布可以看作是投影到&lt;span class="math"&gt;\(x_a\)&lt;/span&gt;轴上的结果，而条件高斯分布则是&lt;span class="math"&gt;\(x_a\)&lt;/span&gt;在&lt;span class="math"&gt;\(x_b=0.7\)&lt;/span&gt;线上的图形。&lt;/p&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+    
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</summary><category term="基础知识"></category></entry></feed>

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Fingertap</title><link href="asdf/" rel="alternate"></link><link href="asdf/feeds/prml-notes.atom.xml" rel="self"></link><id>asdf/</id><updated>2016-08-26T17:05:00+08:00</updated><entry><title>PRML Introduction Note</title><link href="asdf/PRML_01.html" rel="alternate"></link><published>2016-08-26T17:05:00+08:00</published><author><name>Han Zhang</name></author><id>tag:,2016-08-26:asdf/PRML_01.html</id><summary type="html">&lt;h1&gt;机器学习分类&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;有监督学习：有带类标的训练数据来训练模型，模型用来预测不带类标的测试数据的output。&lt;/li&gt;
+&lt;li&gt;无监督学习：无训练数据，所有数据不带类标，目的学习出数据的结构、分布知识。&lt;/li&gt;
+&lt;li&gt;半监督学习：部分训练数据带类标，作为seed以得到其他点的类标或训练模型（偏有监督），或者学习出数据的结构、分布信息（偏无监督）。&lt;/li&gt;
+&lt;li&gt;强化学习：类似婴儿学步，通过反馈以优化模型。采取的输入为两种之一：exploration（探索新的action是否有好的结果）和exploitation（采取已知的可以得到好的结果的action）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;基本概率知识&lt;/h1&gt;
+&lt;h2&gt;两法则&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;加法法则：联合分布（边缘化为）边缘分布。
+&lt;div class="math"&gt;$$\int{P(x, y)}\text{d}x = P(y)$$&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;乘法法则：条件分布和边缘分布（乘积为）联合分布。
+&lt;div class="math"&gt;$$P(x|y)P(y) = P(x, y)$$&lt;/div&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;贝叶斯定理&lt;/h2&gt;
+&lt;div class="math"&gt;$$P(y|x) = \frac{P(x|y)P(y)}{P(x)}$$&lt;/div&gt;
+&lt;p&gt;
+当输入一定时，&lt;code&gt;后验∝似然×先验&lt;/code&gt;，因此后验可看做先验经过似然修正后的分布。若取共轭分布，则后验和先验具有相同的形式，可实现sequential learning，此时先验等价于一系列虚假的有效数据点。&lt;/p&gt;
+&lt;h2&gt;期望&lt;/h2&gt;
+&lt;p&gt;概率密度的范函，当概率密度函数确定时确定。
+&lt;/p&gt;
+&lt;div class="math"&gt;$$\mathbb{E}[f(x)]=\int f(x)P(x)\text{d}x$$&lt;/div&gt;
+&lt;p&gt;
+条件期望、联合期望只是积分的概率密度不同：
+&lt;/p&gt;
+&lt;div class="math"&gt;$$\mathbb{E}[x|y]=\int xP(x|y)\text{d}x$$&lt;/div&gt;
+&lt;div class="math"&gt;$$\mathbb{E}_x[x,y]=\int xP(x, y)\text{d}x$$&lt;/div&gt;
+&lt;p&gt;
+对于变量&lt;span class="math"&gt;\(z = f(x, y)\)&lt;/span&gt;，需要在&lt;span class="math"&gt;\(x\)&lt;/span&gt;、&lt;span class="math"&gt;\(y\)&lt;/span&gt;上积分：
+&lt;/p&gt;
+&lt;div class="math"&gt;\begin{split}
+\mathbb{E}[x+y]&amp;amp;=\int\int{(x+y)P(x, y)}\text{d}x\text{d}y\\
+&amp;amp;=\int\int xP(x|y)P(y)\text{d}x\text{d}y+\int\int yP(y|x)P(x)\text{d}y\text{d}x \\
+&amp;amp;=\mathbb{E}[x|y]+\mathbb{E}[y|x]
+\end{split}&lt;/div&gt;
+&lt;h2&gt;方差&lt;/h2&gt;
+&lt;p&gt;概率密度的范函，当概率密度函数确定时确定。
+&lt;/p&gt;
+&lt;div class="math"&gt;\begin{split}
+\text{var}[x]&amp;amp;=\mathbb{E}[(x-\mathbb{E}[x])^2]\\
+&amp;amp;=\mathbb{E}[x^2-2\mathbb{E}[x]\cdot{x}+\mathbb{E}[x]^2]\\
+&amp;amp;=\mathbb{E}[x^2]-\mathbb{E}[x]^2
+\end{split}&lt;/div&gt;
+&lt;p&gt;
+两变量方差的和即可写作：
+&lt;/p&gt;
+&lt;div class="math"&gt;\begin{split}
+\text{var}[x+y]&amp;amp;=\mathbb{E}[(x+y)^2]-\mathbb{E}[x+y]^2\\
+&amp;amp;=\mathbb{E}[x^2|y]+2\mathbb{E}[xy]+\mathbb{E}[y^2|x]\\
+&amp;amp;~~~-\mathbb{E}[x|y]^2-2\mathbb{E}[x|y]\mathbb{E}[y|x]-\mathbb{E}[y|x]^2\\
+&amp;amp;=\text{var}[x|y]+\text{var}[y|x]+2(\mathbb{E}[xy]-\mathbb{E}[x|y]\mathbb{E}[y|x])
+\end{split}&lt;/div&gt;
+&lt;p&gt;
+因此对于方差之和，存在交叉项。当变量相互独立时交叉项消失。&lt;/p&gt;
+&lt;h2&gt;协方差&lt;/h2&gt;
+&lt;p&gt;概率密度的范函，当概率密度函数确定时确定。
+&lt;/p&gt;
+&lt;div class="math"&gt;\begin{split}
+\text{cov}[x, y]&amp;amp;=\mathbb{E}[(x-\mathbb{E}[x])(y-\mathbb{E}[y])]\\
+&amp;amp;=\mathbb{E}[xy-\mathbb{E}[x]y-\mathbb{E}[y]x+\mathbb{E}[x]\mathbb{E}[y]]\\
+&amp;amp;=\mathbb{E}[xy]-\mathbb{E}[x]\mathbb{E}[y]
+\end{split}&lt;/div&gt;
+&lt;h1&gt;贝叶斯方法&lt;/h1&gt;
+&lt;h2&gt;对模型参数的不同理解&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;频率学派：模型参数是固定的量，其值用“estimator”估计（如“likelihoo    d”）通过重复实验获取数据以逼近模型参数真实值。&lt;/li&gt;
+&lt;li&gt;贝叶斯学派：模型参数是不确定量，其不确定性用先验分布描述，用实验数据（likelihood）来修正先验。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;贝叶斯方法流程&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;写出似然函数 &lt;span class="math"&gt;\(P(\mathcal{D}|\omega)\)&lt;/span&gt;，求其最大值，得到最大似然估计(&lt;span class="math"&gt;\(\omega_{MLE}\)&lt;/span&gt;)。&lt;/li&gt;
+&lt;li&gt;对参数引入先验 &lt;span class="math"&gt;\(P(\omega)\)&lt;/span&gt;，用贝叶斯公式得到后验概率 &lt;span class="math"&gt;\(P(\omega|\mathcal{D})\propto P(\omega)P(\mathcal{D}|\omega)\)&lt;/span&gt;，最大化后验概率得最大后验解(&lt;span class="math"&gt;\(\omega_{MAP}\)&lt;/span&gt;)。&lt;/li&gt;
+&lt;li&gt;引入输出在参数下的条件分布&lt;span class="math"&gt;\(P(y|\omega)\)&lt;/span&gt;，利用贝叶斯公式得到输出和参数的联合概率&lt;span class="math"&gt;\(P(y, \omega|\mathcal{D})=P(\omega|\mathcal{D})P(y|\omega)\)&lt;/span&gt;，并对&lt;span class="math"&gt;\(\omega\)&lt;/span&gt;积分，得到预测分布&lt;span class="math"&gt;\(P(y|\mathcal{D})\)&lt;/span&gt;，至此没有参数&lt;span class="math"&gt;\(\omega\)&lt;/span&gt;，因此不会过拟合。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1&gt;模型选择&lt;/h1&gt;
+&lt;p&gt;两种思路：信息准则或交叉验证。&lt;/p&gt;
+&lt;h2&gt;信息准则&lt;/h2&gt;
+&lt;p&gt;加入正则化项惩罚过拟合的模型。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;缺点：对于AIC和BIC，若不顾参数的不确定性则会偏好过份简单的模型。&lt;/li&gt;
+&lt;li&gt;优点：可以一次训练出需要的模型。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;交叉验证&lt;/h2&gt;
+&lt;p&gt;用部分数据集作为训练集，另一部分作为测试集，多次训练，找到在测试集上泛化能力最好的模型。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;优点：对简单模型和复杂模型无偏好。&lt;/li&gt;
+&lt;li&gt;缺点：1）有多个参数需要组合观察效果时需要指数级的运行次数；2）折数多时训练成本很大。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;决策论&lt;/h1&gt;
+&lt;h2&gt;损失函数&lt;/h2&gt;
+&lt;p&gt;损失函数是给定的，损失区域（损失函数的积分区域）是不定的。若是最小期望损失，则是积分较低的类后验概率与变量轴围成的区域。&lt;/p&gt;
+&lt;p&gt;对于离散值：
+&lt;/p&gt;
+&lt;div class="math"&gt;$$\mathbb{E}[L]=\sum_k\sum_j\int_{\mathcal{R}_j}L_{kj}P(\mathbf{x}, \mathcal{C}_k)\text{d}\mathbf{x}$$&lt;/div&gt;
+&lt;p&gt;
+对于连续值：
+&lt;/p&gt;
+&lt;div class="math"&gt;$$\mathbb{E}[L]=\int\int L(t, y(\mathbf{x}))P(\mathbf{x}, t)\text{d}\mathbf{x}\text{d}t$$&lt;/div&gt;
+&lt;p&gt;
+利用损失函数的一般形式可以计算一些一般意义上的损失界问题。&lt;/p&gt;
+&lt;h2&gt;判别函数、判别模型、生成模型&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;生成模型：对输入或输出建模。先估计参数，再通过&lt;code&gt;似然×先验&lt;/code&gt;的形式得到后验概率。&lt;/li&gt;
+&lt;li&gt;判别模型：直接对后验分布建模。&lt;/li&gt;
+&lt;li&gt;判别函数：从输入到输出的一个哈希函数，直接完成推断和决策过程。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;生成模型和判别模型因为只完成推断（估计后验概率），因此决策方式可以自由修改，而判别函数需要随着决策方式的修改而不断重新学习。&lt;/p&gt;
+&lt;p&gt;生成模型因为要多估计参数，因此相较判别模型更浪费计算资源，但是可以做离群点检测。&lt;/p&gt;
+&lt;p&gt;计算后验概率有助于：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;利用后验概率确定拒绝选项的标准&lt;/li&gt;
+&lt;li&gt;补偿先验概率（人造平衡数据集进行学习模型后，对“平衡”这一假设进行补偿）：
+&lt;div class="math"&gt;$$\frac{平衡后验}{平衡先验}\times实际先验=实际后验$$&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;利用独立性学习组合模型&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;信息论&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;熵&lt;/strong&gt;是信息量 &lt;span class="math"&gt;\(\log{P(x)}\)&lt;/span&gt; 的负期望，为概率密度函数的范函，衡量变量所提供信息量的多少：
+&lt;/p&gt;
+&lt;div class="math"&gt;$$\text{H}[x] = -\int P(x)\log{P(x)}\text{d}x$$&lt;/div&gt;
+&lt;p&gt;
+&lt;strong&gt;KL散度&lt;/strong&gt;是相对信息量 &lt;span class="math"&gt;\(\log{\frac{P(y)}{P(x}}\)&lt;/span&gt; 的负期望，为概率密度的范函，衡量两个分布的差距，非负：
+&lt;/p&gt;
+&lt;div class="math"&gt;$$\text{KL}(P(x)||P(y))=-\int P(x)\log \frac{P(y)}{P(x)}\text{d}x$$&lt;/div&gt;
+&lt;p&gt;
+&lt;strong&gt;互信息&lt;/strong&gt;是一个KL散度，衡量变量的独立程度：
+&lt;/p&gt;
+&lt;div class="math"&gt;$$\text{I}[x, y] = \text{KL}(P(x, y)||P(x)P(y))$$&lt;/div&gt;
+&lt;p&gt;
+联系（由定义可证）：
+&lt;/p&gt;
+&lt;div class="math"&gt;$$
+\text{H}[x,y]=\text{H}[x] + \text{H}[y|x] = \text{H}[y] + \text{H}[x|y]
+$$&lt;/div&gt;
+&lt;div class="math"&gt;$$\text{I}[x, y] =\text{H}[y]-\text{H}[y|x]=\text{H}[x]-\text{H}[x|y]$$&lt;/div&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+    
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</summary><category term="Machine Learning"></category><category term="Notes"></category></entry></feed>
