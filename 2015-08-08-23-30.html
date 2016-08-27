@@ -6,12 +6,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="我用到的Markdown语法 Markdown是一种便于上手的排版语言，并且最大的优点之一是它的源码也具有很高的可读性。这里总结的是我在写博客时会用到的一些markdown语法，便于遗忘的时候查阅。 标题 在markdown中，用多个“#+文字”可得到需要一至六级标题： # 一级标题 ## 二级标题 ### 三级标题 #### 四级标题 ##### 五级标题 ###### 六级标题 效果为 ...">
         <meta name="keywords" content="常用技巧">
-        <link rel="icon" href="http://fingertap.github.io/favicon.ico">
+        <link rel="icon" href="/favicon.ico">
 
         <title>我用到的Markdown语法 - Fingertap</title>
 
         <!-- Stylesheets -->
-        <link href="http://fingertap.github.io/theme/css/all.min.css" rel="stylesheet">
+        <link href="/theme/css/all.min.css" rel="stylesheet">
         <!-- /Stylesheets -->
 
         <!-- RSS Feeds -->
@@ -35,12 +35,12 @@
             <div class="container">
                 <div class="header-nav">
                     <div class="header-logo">
-                        <a herf="http://fingertap.github.io/" class="pull-left"><img class="mr20" src="http://fingertap.github.io/images/logo.gif" alt="logo"/></a>
-                        <a href="http://fingertap.github.io/" class="pull-left">Fingertap</a>
+                        <a herf="/" class="pull-left"><img class="mr20" src="/images/logo.gif" alt="logo"/></a>
+                        <a href="/" class="pull-left">Fingertap</a>
                     </div>
                     <div class="nav pull-right">
-                            <a href="http://fingertap.github.io/about.html">About</a>
-                            <a href="http://fingertap.github.io/categories.html">Categories</a>
+                            <a href="/about.html">About</a>
+                            <a href="/categories.html">Categories</a>
                     </div>
                 </div>
             </div>
@@ -53,11 +53,11 @@
               <div class="col-lg-12">
                   <div class="header-content">
                       <h1 class="header-title">我用到的Markdown语法</h1>
-                      <p class="header-date">By <a href="http://fingertap.github.io/author/aaron.html">Aaron</a>, 六 08 八月 2015, modified 六 08 八月 2015, in category <a href="http://fingertap.github.io/category/bei-wang.html">备忘</a></p>
+                      <p class="header-date">By <a href="/author/aaron.html">Aaron</a>, 六 08 八月 2015, modified 六 08 八月 2015, in category <a href="/category/bei-wang.html">备忘</a></p>
                       <div class="clearfix"></div>
                       <p class="pull-right header-tags">
                           <span class="glyphicon glyphicon-tags mr5" aria-hidden="true"></span>
-<a href="http://fingertap.github.io/tag/chang-yong-ji-qiao.html">常用技巧</a>                      </p>
+<a href="/tag/chang-yong-ji-qiao.html">常用技巧</a>                      </p>
                   </div>
               </div>
         </div>
@@ -170,9 +170,64 @@ $$ e^{i\pi} + 1 = 0 $$
 
 <p>效果为</p>
 <blockquote>
-<p>$c^2 = a^2 + b^2$
-$$ e^{i\pi} + 1 = 0 $$</p>
+<p><span class="math">\(c^2 = a^2 + b^2\)</span>
+<div class="math">$$ e^{i\pi} + 1 = 0 $$</div>
+</p>
 </blockquote>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+    
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
 
 
     </div>
@@ -185,9 +240,9 @@ $$ e^{i\pi} + 1 = 0 $$</p>
                     <div class="col-xs-4 col-sm-3 col-md-3 col-lg-3">
                         <div class="footer-title">Sitemap</div>
                         <ul class="list-unstyled">
-                            <li><a href="http://fingertap.github.io/archives.html">Archives</a></li>
-                            <li><a href="http://fingertap.github.io/tags.html">Tags</a></li>
-                            <li><a href="http://fingertap.github.io/authors.html">Authors</a></li>
+                            <li><a href="/archives.html">Archives</a></li>
+                            <li><a href="/tags.html">Tags</a></li>
+                            <li><a href="/authors.html">Authors</a></li>
                         </ul>
                     </div>
                     <div class="col-xs-4 col-sm-3 col-md-3 col-lg-3">

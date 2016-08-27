@@ -4,14 +4,14 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="高斯分布总结 高斯分布的历史背景我就不赘述了，这篇文章主要是想记下来我在学习高斯分布中遇到的所有的问题，并且做一个总结，更好地掌握高斯分布的性质，目的是从计算推导的角度帮助理解高斯分布。这篇文章绝大部分基于PRML。 首先，高斯分布的单维形式，也即变量是$\mathbb{R}^{1\times{1}}$时，表示为 $$ \begin{equation} \mathcal{N}(x|\mu ...">
+        <meta name="description" content="高斯分布总结 高斯分布的历史背景我就不赘述了，这篇文章主要是想记下来我在学习高斯分布中遇到的所有的问题，并且做一个总结，更好地掌握高斯分布的性质，目的是从计算推导的角度帮助理解高斯分布。这篇文章绝大部分基于PRML。 首先，高斯分布的单维形式，也即变量是\(\mathbb{R}^{1\times{1}}\)时，表示为 $$ \begin{equation} ...">
         <meta name="keywords" content="基础知识">
-        <link rel="icon" href="http://fingertap.github.io/favicon.ico">
+        <link rel="icon" href="/favicon.ico">
 
         <title>高斯分布总结 - Fingertap</title>
 
         <!-- Stylesheets -->
-        <link href="http://fingertap.github.io/theme/css/all.min.css" rel="stylesheet">
+        <link href="/theme/css/all.min.css" rel="stylesheet">
         <!-- /Stylesheets -->
 
         <!-- RSS Feeds -->
@@ -35,12 +35,12 @@
             <div class="container">
                 <div class="header-nav">
                     <div class="header-logo">
-                        <a herf="http://fingertap.github.io/" class="pull-left"><img class="mr20" src="http://fingertap.github.io/images/logo.gif" alt="logo"/></a>
-                        <a href="http://fingertap.github.io/" class="pull-left">Fingertap</a>
+                        <a herf="/" class="pull-left"><img class="mr20" src="/images/logo.gif" alt="logo"/></a>
+                        <a href="/" class="pull-left">Fingertap</a>
                     </div>
                     <div class="nav pull-right">
-                            <a href="http://fingertap.github.io/about.html">About</a>
-                            <a href="http://fingertap.github.io/categories.html">Categories</a>
+                            <a href="/about.html">About</a>
+                            <a href="/categories.html">Categories</a>
                     </div>
                 </div>
             </div>
@@ -53,11 +53,11 @@
               <div class="col-lg-12">
                   <div class="header-content">
                       <h1 class="header-title">高斯分布总结</h1>
-                      <p class="header-date">By <a href="http://fingertap.github.io/author/aaron.html">Aaron</a>, 三 19 八月 2015, modified 三 19 八月 2015, in category <a href="http://fingertap.github.io/category/ji-qi-xue-xi.html">机器学习</a></p>
+                      <p class="header-date">By <a href="/author/aaron.html">Aaron</a>, 三 19 八月 2015, modified 三 19 八月 2015, in category <a href="/category/ji-qi-xue-xi.html">机器学习</a></p>
                       <div class="clearfix"></div>
                       <p class="pull-right header-tags">
                           <span class="glyphicon glyphicon-tags mr5" aria-hidden="true"></span>
-<a href="http://fingertap.github.io/tag/ji-chu-zhi-shi.html">基础知识</a>                      </p>
+<a href="/tag/ji-chu-zhi-shi.html">基础知识</a>                      </p>
                   </div>
               </div>
         </div>
@@ -73,183 +73,238 @@
     <div class="container content">
         <h1>高斯分布总结</h1>
 <p>高斯分布的历史背景我就不赘述了，这篇文章主要是想记下来我在学习高斯分布中遇到的所有的问题，并且做一个总结，更好地掌握高斯分布的性质，目的是从计算推导的角度帮助理解高斯分布。这篇文章绝大部分基于PRML。</p>
-<p>首先，高斯分布的单维形式，也即变量是$\mathbb{R}^{1\times{1}}$时，表示为</p>
-<p>$$
+<p>首先，高斯分布的单维形式，也即变量是<span class="math">\(\mathbb{R}^{1\times{1}}\)</span>时，表示为</p>
+<div class="math">$$
 \begin{equation}
-\mathcal{N}(x|\mu ,\sigma^2) = \frac{1}{(2\pi\sigma^2)^{1/2}}\exp\bigg{-\frac{1}{2\sigma^2}(x-\mu)^2\bigg}
+\mathcal{N}(x|\mu ,\sigma^2) = \frac{1}{(2\pi\sigma^2)^{1/2}}\exp\bigg\{-\frac{1}{2\sigma^2}(x-\mu)^2\bigg\}
 \end{equation}
-$$</p>
-<p>其中，$\sigma$是方差，而$\mu$代表均值。而其多维形式，也即变量是一个$\mathbb{R}^{D\times{1}}$列向量时，表示为</p>
-<p>$$
+$$</div>
+<p>其中，<span class="math">\(\sigma\)</span>是方差，而<span class="math">\(\mu\)</span>代表均值。而其多维形式，也即变量是一个<span class="math">\(\mathbb{R}^{D\times{1}}\)</span>列向量时，表示为</p>
+<div class="math">$$
 \begin{equation}
-\mathcal{N}(\mathbf{x}|\boldsymbol{\mu},\boldsymbol{\Sigma})=\frac{1}{(2\pi)^{D/2}}\frac{1}{|\boldsymbol{\Sigma}|^{1/2}}\exp\bigg{-\frac{1}{2}(\mathbf{x}-\boldsymbol\mu)^T\boldsymbol{\Sigma}^{-1}(\mathbf{x}-\boldsymbol\mu)\bigg}
+\mathcal{N}(\mathbf{x}|\boldsymbol{\mu},\boldsymbol{\Sigma})=\frac{1}{(2\pi)^{D/2}}\frac{1}{|\boldsymbol{\Sigma}|^{1/2}}\exp\bigg\{-\frac{1}{2}(\mathbf{x}-\boldsymbol\mu)^T\boldsymbol{\Sigma}^{-1}(\mathbf{x}-\boldsymbol\mu)\bigg\}
 \end{equation}
-$$</p>
-<p>其中$\boldsymbol{\Sigma}$是$\mathbf{x}$的协方差矩阵，总是对称的，$\boldsymbol{\mu}$是均值向量。</p>
-<p>多维高斯分布是由多个独立高斯分布乘积所得，描述了一个$D$维空间中的高斯分布。</p>
+$$</div>
+<p>其中<span class="math">\(\boldsymbol{\Sigma}\)</span>是<span class="math">\(\mathbf{x}\)</span>的协方差矩阵，总是对称的，<span class="math">\(\boldsymbol{\mu}\)</span>是均值向量。</p>
+<p>多维高斯分布是由多个独立高斯分布乘积所得，描述了一个<span class="math">\(D\)</span>维空间中的高斯分布。</p>
 <h2>单维高斯分布基本性质</h2>
 <p>这一节总结一下高斯分布的基本性质以及计算方法。</p>
 <h3>概率分布基本性质</h3>
 <p>作为合理概率分布，高斯分布在定义域内积分为1且恒正。</p>
-<p>$$
+<div class="math">$$
 \begin{equation}
 \begin{aligned}
 \int_{-\infty}^{+\infty}\mathcal{N}(x|\mu ,\sigma^2)
-&amp;= \frac{1}{(2\pi\sigma^2)^{1/2}}\int_{-\infty}^{+\infty}{\exp\bigg{-\frac{x}{2\sigma^2}\bigg}\mathrm{d}x}\
-&amp;= \frac{1}{\sqrt{\pi}}\int_{-\infty}^{+\infty}{e^{-u^2}\mathrm{d}u} \
-&amp;= \frac{1}{\sqrt{\pi}}\sqrt{\int_{-\infty}^{+\infty}\int_{-\infty}^{+\infty}e^{-x^2-y^2}\mathrm{d}x\mathrm{d}y} \
-&amp;= \frac{1}{\sqrt{\pi}}\sqrt{\int_{0}^{2\pi}\mathrm{d}\theta\int_{0}^{\infty}r\cdot{e^{-r^2}}\mathrm{d}r} \
+&amp;= \frac{1}{(2\pi\sigma^2)^{1/2}}\int_{-\infty}^{+\infty}{\exp\bigg\{-\frac{x}{2\sigma^2}\bigg\}\mathrm{d}x}\\
+&amp;= \frac{1}{\sqrt{\pi}}\int_{-\infty}^{+\infty}{e^{-u^2}\mathrm{d}u} \\
+&amp;= \frac{1}{\sqrt{\pi}}\sqrt{\int_{-\infty}^{+\infty}\int_{-\infty}^{+\infty}e^{-x^2-y^2}\mathrm{d}x\mathrm{d}y} \\
+&amp;= \frac{1}{\sqrt{\pi}}\sqrt{\int_{0}^{2\pi}\mathrm{d}\theta\int_{0}^{\infty}r\cdot{e^{-r^2}}\mathrm{d}r} \\
 &amp;= 1
 \end{aligned}
 \end{equation}
-$$</p>
+$$</div>
 <p>因为是指数函数，因此概率恒为正。</p>
 <h3>期望和方差</h3>
-<p>高斯分布的期望为$\mu$，在计算的过程中利用奇函数部分积分为零。</p>
-<p>$$
+<p>高斯分布的期望为<span class="math">\(\mu\)</span>，在计算的过程中利用奇函数部分积分为零。</p>
+<div class="math">$$
 \begin{equation}
 \begin{aligned}
-\mathbb{E}[x] &amp;= \int_{-\infty}^{+\infty}\mathcal{N}(x|\mu ,\sigma^2)x\mathrm{d}x \
-&amp;= \mu\int_{-\infty}^{+\infty}\mathcal{N}(x|\mu ,\sigma^2)\mathrm{d}x + \int_{-\infty}^{+\infty} x\cdot{\frac{1}{(2\pi\sigma^2)^{1/2}}\exp\big{-\frac{x^2}{2\sigma^2}\big}}\mathrm{d}x \
-&amp;= \mu + 0 \
+\mathbb{E}[x] &amp;= \int_{-\infty}^{+\infty}\mathcal{N}(x|\mu ,\sigma^2)x\mathrm{d}x \\
+&amp;= \mu\int_{-\infty}^{+\infty}\mathcal{N}(x|\mu ,\sigma^2)\mathrm{d}x + \int_{-\infty}^{+\infty} x\cdot{\frac{1}{(2\pi\sigma^2)^{1/2}}\exp\big\{-\frac{x^2}{2\sigma^2}\big\}}\mathrm{d}x \\
+&amp;= \mu + 0 \\
 &amp;= \mu
 \end{aligned}
 \end{equation}
-$$</p>
-<p>高斯分布的方差为$\sigma$，在计算的过程中同样利用到了奇偶性，首先看二阶矩</p>
-<p>$$
+$$</div>
+<p>高斯分布的方差为<span class="math">\(\sigma\)</span>，在计算的过程中同样利用到了奇偶性，首先看二阶矩</p>
+<div class="math">$$
 \begin{equation}
 \begin{aligned}
-\mathbb{E}[x^2] &amp;= \mu^2 + \int_{-\infty}^{+\infty}\frac{1}{(2\pi\sigma^2)^{1/2}}\exp\big{-\frac{x^2}{2\sigma^2}\big} \ 
-&amp;\ + 2\mu\cdot{\int_{-\infty}^{+\infty}x\cdot{\frac{1}{(2\pi\sigma^2)^{1/2}}\exp\big{-\frac{x^2}{2\sigma^2}\big}}}\
-&amp;= \mu^2 + \sigma^2 + 0 \
+\mathbb{E}[x^2] &amp;= \mu^2 + \int_{-\infty}^{+\infty}\frac{1}{(2\pi\sigma^2)^{1/2}}\exp\big\{-\frac{x^2}{2\sigma^2}\big\} \\ 
+&amp;\ + 2\mu\cdot{\int_{-\infty}^{+\infty}x\cdot{\frac{1}{(2\pi\sigma^2)^{1/2}}\exp\big\{-\frac{x^2}{2\sigma^2}\big\}}}\\
+&amp;= \mu^2 + \sigma^2 + 0 \\
 &amp;= \mu^2 + \sigma^2
 \end{aligned}
 \end{equation}
-$$</p>
+$$</div>
 <p>得到二阶矩以后，方差很容易求得</p>
-<p>$$
+<div class="math">$$
 \begin{equation}
 \text{var}[x] = \mathbb{E}[x^2]-\mathbb{E}[x]^2=\sigma^2
 \end{equation}
-$$</p>
+$$</div>
 <h2>单维和多维高斯分布之间的关系</h2>
 <p>多维高斯分布和单维高斯分布之间，因为不同变量间的独立性，其实是乘积的关系。多维高斯分布的公式其实是多组独立的满足高斯分布的变量的乘积利用协方差矩阵经过化简以后得到的结果。</p>
 <p>暂时不管指数函数的系数，它们起到的作用仅仅是归一化。首先观察多维高斯分布的指数部分</p>
-<p>$$
+<div class="math">$$
 \begin{equation}
 \Delta^2 = (\mathbf{x}-\boldsymbol\mu)^T\boldsymbol{\Sigma}^{-1}(\mathbf{x}-\boldsymbol\mu)
 \end{equation}
-$$</p>
-<p>这里的$\Delta$是马氏距离，其中$\boldsymbol{\Sigma}$为单位矩阵时马氏距离退化为欧氏距离。</p>
-<p>协方差矩阵$\boldsymbol{\Sigma}$根据协方差定义为实对称矩阵，取$\boldsymbol{\Sigma}$的单位正交特征向量集$\mathbf{u}_i$有</p>
-<p>$$
+$$</div>
+<p>这里的<span class="math">\(\Delta\)</span>是马氏距离，其中<span class="math">\(\boldsymbol{\Sigma}\)</span>为单位矩阵时马氏距离退化为欧氏距离。</p>
+<p>协方差矩阵<span class="math">\(\boldsymbol{\Sigma}\)</span>根据协方差定义为实对称矩阵，取<span class="math">\(\boldsymbol{\Sigma}\)</span>的单位正交特征向量集<span class="math">\(\mathbf{u}_i\)</span>有</p>
+<div class="math">$$
 \begin{equation}
 \boldsymbol{\Sigma}\mathbf{u}_i = \lambda{}_i\mathbf{u}_i
 \end{equation}
-$$</p>
-<p>其中$\lambda{}_i$为对应的特征值。</p>
+$$</div>
+<p>其中<span class="math">\(\lambda{}_i\)</span>为对应的特征值。</p>
 <p>用特征分解表示协方差矩阵我们有</p>
-<p>$$
+<div class="math">$$
 \begin{equation}
 \begin{aligned}
 \boldsymbol{\Sigma}
-&amp;= \mathbf{U}\boldsymbol{\Lambda}\mathbf{U}^T \
-&amp;=\sum_{i=1}^{D}\lambda{}_i\mathbf{u}_i\mathbf{u}_i^T \
+&amp;= \mathbf{U}\boldsymbol{\Lambda}\mathbf{U}^T \\
+&amp;=\sum_{i=1}^{D}\lambda{}_i\mathbf{u}_i\mathbf{u}_i^T \\
 \end{aligned}
 \end{equation}
-$$</p>
+$$</div>
 <p>其逆矩阵的特征值为原矩阵的倒数，而  </p>
-<p>$$
+<div class="math">$$
 \begin{equation}
 \begin{aligned}
-\boldsymbol{\Sigma}^{-1} &amp;= (\mathbf{U}\boldsymbol{\Lambda}\mathbf{U}^T)^{-1} \
-&amp;= (\mathbf{U}^T)^{-1}\boldsymbol{\Lambda}^{-1}\mathbf{U}^{-1} \
-&amp;= \mathbf{U}\boldsymbol{\Lambda}^{-1}\mathbf{U}^T \
-&amp;=\sum_{i=1}^{D}\frac{1}{\lambda{}_i}\mathbf{u}_i\mathbf{u}_i^T \
+\boldsymbol{\Sigma}^{-1} &amp;= (\mathbf{U}\boldsymbol{\Lambda}\mathbf{U}^T)^{-1} \\
+&amp;= (\mathbf{U}^T)^{-1}\boldsymbol{\Lambda}^{-1}\mathbf{U}^{-1} \\
+&amp;= \mathbf{U}\boldsymbol{\Lambda}^{-1}\mathbf{U}^T \\
+&amp;=\sum_{i=1}^{D}\frac{1}{\lambda{}_i}\mathbf{u}_i\mathbf{u}_i^T \\
 \end{aligned}
 \end{equation}
-$$</p>
+$$</div>
 <p>带入(7)中有</p>
-<p>$$
+<div class="math">$$
 \begin{equation}
 \begin{aligned}
-\Delta^2 &amp;= (\mathbf{x}-\boldsymbol\mu)^T\sum_{i=1}^{D}\frac{1}{lambda_i}\mathbf{u}<em i="1">i\mathbf{u}_i^T(\mathbf{x}-\boldsymbol\mu) \
-&amp;= \sum</em>^D\frac{y_i^2}{\lambda_i}
+\Delta^2 &amp;= (\mathbf{x}-\boldsymbol\mu)^T\sum_{i=1}^{D}\frac{1}{lambda_i}\mathbf{u}_i\mathbf{u}_i^T(\mathbf{x}-\boldsymbol\mu) \\
+&amp;= \sum_{i=1}^D\frac{y_i^2}{\lambda_i}
 \end{aligned}
 \end{equation}
-$$</p>
-<p>其中， $y_i = \mathbf{u}_i^T(\mathbf{x}-\boldsymbol{\mu})$。</p>
-<p>现在其实已经将多维高斯分布转化为了单维高斯分布，归一化系数因为我们并没有将指数中的项提出，会仍然成立。这时我们的高斯分布是多个高斯分布的乘积（因为这里$y$项在指数中求和）。</p>
-<p>而我们有$\boldsymbol{|\Sigma}| = \prod_{j=1}^D\lambda_j$，因此$\boldsymbol{|\Sigma}|^{1/2} = \prod_{j=1}^D\lambda_j^{1/2}$。因此，最终我们可以将前面的归一化系数也重写</p>
-<p>$$
+$$</div>
+<p>其中， <span class="math">\(y_i = \mathbf{u}_i^T(\mathbf{x}-\boldsymbol{\mu})\)</span>。</p>
+<p>现在其实已经将多维高斯分布转化为了单维高斯分布，归一化系数因为我们并没有将指数中的项提出，会仍然成立。这时我们的高斯分布是多个高斯分布的乘积（因为这里<span class="math">\(y\)</span>项在指数中求和）。</p>
+<p>而我们有<span class="math">\(\boldsymbol{|\Sigma}| = \prod_{j=1}^D\lambda_j\)</span>，因此<span class="math">\(\boldsymbol{|\Sigma}|^{1/2} = \prod_{j=1}^D\lambda_j^{1/2}\)</span>。因此，最终我们可以将前面的归一化系数也重写</p>
+<div class="math">$$
 \begin{equation}
 \begin{aligned}
 \mathcal{N}(\mathbf{x}|\boldsymbol{\mu},\boldsymbol{\Sigma})
 = \prod_{j=1}^D\frac{1}{(2\pi\lambda_j)^{1/2}}\exp{-\frac{y_j^2}{2\lambda_j}}
 \end{aligned}
 \end{equation}
-$$</p>
-<p>这一组独立高斯分布的方差为$\sqrt{\lambda_j}$，均值为0。其乘积即为多维高斯分布。</p>
+$$</div>
+<p>这一组独立高斯分布的方差为<span class="math">\(\sqrt{\lambda_j}\)</span>，均值为0。其乘积即为多维高斯分布。</p>
 <h2>条件高斯分布和边缘高斯分布</h2>
-<p>对于多维高斯分布，若固定一部分变量$\mathbf{x}<em a_b="a|b">b$，另一部分变量$\mathbf{x}_a$仍然满足高斯分布，这个高斯分布即是条件高斯分布$p</em>$。而对多维高斯分布中的一部分变量$\mathbf{x}_b$进行归一化从而得到另一部分$\mathbf{x}_a$的边缘分布也满足高斯分布，这个高斯分布即为边缘高斯分布$p_a$。边缘高斯分布和条件高斯分布的推导都涉及到分块矩阵的二次型问题，因为满足分配率所以推导繁琐但不复杂，因此略去。只需要注意到所利用的性质是协方差矩阵和其逆矩阵<em>precision matrix</em> $\boldsymbol\Lambda$都是对称矩阵，所以二次型中前后向量交换是等价的。</p>
-<p>直接给出条件高斯分布和边缘高斯分布的结果。给定一个联合高斯分布$\mathcal{N}(\mathbf{x}|\boldsymbol{\mu}, \boldsymbol{\Sigma})$，并且记$\boldsymbol{\Lambda} = \boldsymbol{\Sigma}^{-1}$，且有</p>
-<p>$$
+<p>对于多维高斯分布，若固定一部分变量<span class="math">\(\mathbf{x}_b\)</span>，另一部分变量<span class="math">\(\mathbf{x}_a\)</span>仍然满足高斯分布，这个高斯分布即是条件高斯分布<span class="math">\(p_{a|b}\)</span>。而对多维高斯分布中的一部分变量<span class="math">\(\mathbf{x}_b\)</span>进行归一化从而得到另一部分<span class="math">\(\mathbf{x}_a\)</span>的边缘分布也满足高斯分布，这个高斯分布即为边缘高斯分布<span class="math">\(p_a\)</span>。边缘高斯分布和条件高斯分布的推导都涉及到分块矩阵的二次型问题，因为满足分配率所以推导繁琐但不复杂，因此略去。只需要注意到所利用的性质是协方差矩阵和其逆矩阵<em>precision matrix</em> <span class="math">\(\boldsymbol\Lambda\)</span>都是对称矩阵，所以二次型中前后向量交换是等价的。</p>
+<p>直接给出条件高斯分布和边缘高斯分布的结果。给定一个联合高斯分布<span class="math">\(\mathcal{N}(\mathbf{x}|\boldsymbol{\mu}, \boldsymbol{\Sigma})\)</span>，并且记<span class="math">\(\boldsymbol{\Lambda} = \boldsymbol{\Sigma}^{-1}\)</span>，且有</p>
+<div class="math">$$
 \begin{equation}
 \mathbf{x} = 
 \left(
 \begin{array}{c}
-\mathbf{x}_a \
-\mathbf{x}_b \
+\mathbf{x}_a \\
+\mathbf{x}_b \\
 \end{array}
 \right),
 \boldsymbol{\mu} = 
 \left(
 \begin{array}{c}
-\boldsymbol{\mu}_a \
-\boldsymbol{\mu}_b \
+\boldsymbol{\mu}_a \\
+\boldsymbol{\mu}_b \\
 \end{array}
 \right)
 \end{equation}
-$$</p>
-<p>$$
+$$</div>
+<div class="math">$$
 \begin{equation}
 \boldsymbol{\Sigma}=
 \left(
 \begin{array}{cc}
-&amp;\boldsymbol{\Sigma}<em ab="ab">{aa} &amp;\boldsymbol{\Sigma}</em> \
-&amp;\boldsymbol{\Sigma}<em bb="bb">{ba} &amp;\boldsymbol{\Sigma}</em> \
+&amp;\boldsymbol{\Sigma}_{aa} &amp;\boldsymbol{\Sigma}_{ab} \\
+&amp;\boldsymbol{\Sigma}_{ba} &amp;\boldsymbol{\Sigma}_{bb} \\
 \end{array}
 \right),
 \boldsymbol{\Lambda}=
 \left(
 \begin{array}{cc}
-\boldsymbol{\Lambda}<em ab="ab">{aa} &amp;\boldsymbol{\Lambda}</em> \
-\boldsymbol{\Lambda}<em bb="bb">{ba} &amp;\boldsymbol{\Lambda}</em> \
+\boldsymbol{\Lambda}_{aa} &amp;\boldsymbol{\Lambda}_{ab} \\
+\boldsymbol{\Lambda}_{ba} &amp;\boldsymbol{\Lambda}_{bb} \\
 \end{array}
 \right)
 \end{equation}
-$$</p>
+$$</div>
 <p>条件分布即为：</p>
-<p>$$
+<div class="math">$$
 \begin{equation}
-p(\mathbf{x}<em a_b="a|b">a|\mathbf{x}_b) = \mathcal{N}(\mathbf{x}_a|\boldsymbol{\mu}</em>, \boldsymbol{\Lambda_aa}^-1)
+p(\mathbf{x}_a|\mathbf{x}_b) = \mathcal{N}(\mathbf{x}_a|\boldsymbol{\mu}_{a|b}, \boldsymbol{\Lambda_aa}^-1)
 \end{equation}
-$$</p>
-<p>$$
+$$</div>
+<div class="math">$$
 \begin{equation}
-\boldsymbol{\mu}<em aa="aa">{a|b} = \boldsymbol{\mu}_a - \boldsymbol{\Lambda}</em>
+\boldsymbol{\mu}_{a|b} = \boldsymbol{\mu}_a - \boldsymbol{\Lambda}_{aa}
 \end{equation}
-$$</p>
+$$</div>
 <p>边缘概率分布即为：
-$$
+</p>
+<div class="math">$$
 \begin{equation}
-p(\mathbf{x}-a) = \mathcal{N}(\mathbf{x}<em aa="aa">a|\boldsymbol{\mu}_a, \boldsymbol{\Sigma}</em>)
+p(\mathbf{x}-a) = \mathcal{N}(\mathbf{x}_a|\boldsymbol{\mu}_a, \boldsymbol{\Sigma}_{aa})
 \end{equation}
-$$</p>
+$$</div>
 <p>这里用PRML中的图来帮助定性的理解。</p>
 <p><img alt="条件高斯分布和边缘高斯分布" src="/images/PRML2-9.png" /></p>
-<p>上图中左边两个变量上的高斯概率分布$p(x_a, x_b)$的等高线轮廓线，右边蓝色曲线是边缘概率分布$p(x_a)$，红色曲线$x_b=0.7$的条件概率分布$p(x_a|x_b)$。边缘概率分布可以看作是投影到$x_a$轴上的结果，而条件高斯分布则是$x_a$在$x_b=0.7$线上的图形。</p>
+<p>上图中左边两个变量上的高斯概率分布<span class="math">\(p(x_a, x_b)\)</span>的等高线轮廓线，右边蓝色曲线是边缘概率分布<span class="math">\(p(x_a)\)</span>，红色曲线<span class="math">\(x_b=0.7\)</span>的条件概率分布<span class="math">\(p(x_a|x_b)\)</span>。边缘概率分布可以看作是投影到<span class="math">\(x_a\)</span>轴上的结果，而条件高斯分布则是<span class="math">\(x_a\)</span>在<span class="math">\(x_b=0.7\)</span>线上的图形。</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+    
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
 
 
     </div>
@@ -262,9 +317,9 @@ $$</p>
                     <div class="col-xs-4 col-sm-3 col-md-3 col-lg-3">
                         <div class="footer-title">Sitemap</div>
                         <ul class="list-unstyled">
-                            <li><a href="http://fingertap.github.io/archives.html">Archives</a></li>
-                            <li><a href="http://fingertap.github.io/tags.html">Tags</a></li>
-                            <li><a href="http://fingertap.github.io/authors.html">Authors</a></li>
+                            <li><a href="/archives.html">Archives</a></li>
+                            <li><a href="/tags.html">Tags</a></li>
+                            <li><a href="/authors.html">Authors</a></li>
                         </ul>
                     </div>
                     <div class="col-xs-4 col-sm-3 col-md-3 col-lg-3">

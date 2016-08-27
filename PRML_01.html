@@ -6,12 +6,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="机器学习分类 有监督学习：有带类标的训练数据来训练模型，模型用来预测不带类标的测试数据的output。 无监督学习：无训练数据，所有数据不带类标，目的学习出数据的结构、分布知识。 半监督学习：部分训练数据带类标，作为seed以得到其他点的类标或训练模型（偏有监督），或者学习出数据的结构、分布信息（偏无监督）。 ...">
         <meta name="keywords" content="Machine Learning, Notes">
-        <link rel="icon" href="http://fingertap.github.io/favicon.ico">
+        <link rel="icon" href="/favicon.ico">
 
         <title>PRML Introduction Note - Fingertap</title>
 
         <!-- Stylesheets -->
-        <link href="http://fingertap.github.io/theme/css/all.min.css" rel="stylesheet">
+        <link href="/theme/css/all.min.css" rel="stylesheet">
         <!-- /Stylesheets -->
 
         <!-- RSS Feeds -->
@@ -35,12 +35,12 @@
             <div class="container">
                 <div class="header-nav">
                     <div class="header-logo">
-                        <a herf="http://fingertap.github.io/" class="pull-left"><img class="mr20" src="http://fingertap.github.io/images/logo.gif" alt="logo"/></a>
-                        <a href="http://fingertap.github.io/" class="pull-left">Fingertap</a>
+                        <a herf="/" class="pull-left"><img class="mr20" src="/images/logo.gif" alt="logo"/></a>
+                        <a href="/" class="pull-left">Fingertap</a>
                     </div>
                     <div class="nav pull-right">
-                            <a href="http://fingertap.github.io/about.html">About</a>
-                            <a href="http://fingertap.github.io/categories.html">Categories</a>
+                            <a href="/about.html">About</a>
+                            <a href="/categories.html">Categories</a>
                     </div>
                 </div>
             </div>
@@ -53,11 +53,11 @@
               <div class="col-lg-12">
                   <div class="header-content">
                       <h1 class="header-title">PRML Introduction Note</h1>
-                      <p class="header-date">By <a href="http://fingertap.github.io/author/han-zhang.html">Han Zhang</a>, 五 26 八月 2016, modified 五 26 八月 2016, in category <a href="http://fingertap.github.io/category/prml-notes.html">Prml notes</a></p>
+                      <p class="header-date">By <a href="/author/han-zhang.html">Han Zhang</a>, 五 26 八月 2016, modified 五 26 八月 2016, in category <a href="/category/prml-notes.html">Prml notes</a></p>
                       <div class="clearfix"></div>
                       <p class="pull-right header-tags">
                           <span class="glyphicon glyphicon-tags mr5" aria-hidden="true"></span>
-<a href="http://fingertap.github.io/tag/machine-learning.html">Machine Learning</a>, <a href="http://fingertap.github.io/tag/notes.html">Notes</a>                      </p>
+<a href="/tag/machine-learning.html">Machine Learning</a>, <a href="/tag/notes.html">Notes</a>                      </p>
                   </div>
               </div>
         </div>
@@ -82,47 +82,60 @@
 <h2>两法则</h2>
 <ul>
 <li>加法法则：联合分布（边缘化为）边缘分布。
-$$\int{P(x, y)}\text{d}x = P(y)$$</li>
+<div class="math">$$\int{P(x, y)}\text{d}x = P(y)$$</div>
+</li>
 <li>乘法法则：条件分布和边缘分布（乘积为）联合分布。
-$$P(x|y)P(y) = P(x, y)$$</li>
+<div class="math">$$P(x|y)P(y) = P(x, y)$$</div>
+</li>
 </ul>
 <h2>贝叶斯定理</h2>
-<p>$$P(y|x) = \frac{P(x|y)P(y)}{P(x)}$$
+<div class="math">$$P(y|x) = \frac{P(x|y)P(y)}{P(x)}$$</div>
+<p>
 当输入一定时，<code>后验∝似然×先验</code>，因此后验可看做先验经过似然修正后的分布。若取共轭分布，则后验和先验具有相同的形式，可实现sequential learning，此时先验等价于一系列虚假的有效数据点。</p>
 <h2>期望</h2>
 <p>概率密度的范函，当概率密度函数确定时确定。
-$$\mathbb{E}[f(x)]=\int f(x)P(x)\text{d}x$$
+</p>
+<div class="math">$$\mathbb{E}[f(x)]=\int f(x)P(x)\text{d}x$$</div>
+<p>
 条件期望、联合期望只是积分的概率密度不同：
-$$\mathbb{E}[x|y]=\int xP(x|y)\text{d}x$$
-$$\mathbb{E}_x[x,y]=\int xP(x, y)\text{d}x$$
-对于变量$z = f(x, y)$，需要在$x$、$y$上积分：
-\begin{split}
-\mathbb{E}[x+y]&amp;=\int\int{(x+y)P(x, y)}\text{d}x\text{d}y\
-&amp;=\int\int xP(x|y)P(y)\text{d}x\text{d}y+\int\int yP(y|x)P(x)\text{d}y\text{d}x \
+</p>
+<div class="math">$$\mathbb{E}[x|y]=\int xP(x|y)\text{d}x$$</div>
+<div class="math">$$\mathbb{E}_x[x,y]=\int xP(x, y)\text{d}x$$</div>
+<p>
+对于变量<span class="math">\(z = f(x, y)\)</span>，需要在<span class="math">\(x\)</span>、<span class="math">\(y\)</span>上积分：
+</p>
+<div class="math">\begin{split}
+\mathbb{E}[x+y]&amp;=\int\int{(x+y)P(x, y)}\text{d}x\text{d}y\\
+&amp;=\int\int xP(x|y)P(y)\text{d}x\text{d}y+\int\int yP(y|x)P(x)\text{d}y\text{d}x \\
 &amp;=\mathbb{E}[x|y]+\mathbb{E}[y|x]
-\end{split}</p>
+\end{split}</div>
 <h2>方差</h2>
 <p>概率密度的范函，当概率密度函数确定时确定。
-\begin{split}
-\text{var}[x]&amp;=\mathbb{E}[(x-\mathbb{E}[x])^2]\
-&amp;=\mathbb{E}[x^2-2\mathbb{E}[x]\cdot{x}+\mathbb{E}[x]^2]\
+</p>
+<div class="math">\begin{split}
+\text{var}[x]&amp;=\mathbb{E}[(x-\mathbb{E}[x])^2]\\
+&amp;=\mathbb{E}[x^2-2\mathbb{E}[x]\cdot{x}+\mathbb{E}[x]^2]\\
 &amp;=\mathbb{E}[x^2]-\mathbb{E}[x]^2
-\end{split}
+\end{split}</div>
+<p>
 两变量方差的和即可写作：
-\begin{split}
-\text{var}[x+y]&amp;=\mathbb{E}[(x+y)^2]-\mathbb{E}[x+y]^2\
-&amp;=\mathbb{E}[x^2|y]+2\mathbb{E}[xy]+\mathbb{E}[y^2|x]\
-&amp;~~~-\mathbb{E}[x|y]^2-2\mathbb{E}[x|y]\mathbb{E}[y|x]-\mathbb{E}[y|x]^2\
+</p>
+<div class="math">\begin{split}
+\text{var}[x+y]&amp;=\mathbb{E}[(x+y)^2]-\mathbb{E}[x+y]^2\\
+&amp;=\mathbb{E}[x^2|y]+2\mathbb{E}[xy]+\mathbb{E}[y^2|x]\\
+&amp;~~~-\mathbb{E}[x|y]^2-2\mathbb{E}[x|y]\mathbb{E}[y|x]-\mathbb{E}[y|x]^2\\
 &amp;=\text{var}[x|y]+\text{var}[y|x]+2(\mathbb{E}[xy]-\mathbb{E}[x|y]\mathbb{E}[y|x])
-\end{split}
+\end{split}</div>
+<p>
 因此对于方差之和，存在交叉项。当变量相互独立时交叉项消失。</p>
 <h2>协方差</h2>
 <p>概率密度的范函，当概率密度函数确定时确定。
-\begin{split}
-\text{cov}[x, y]&amp;=\mathbb{E}[(x-\mathbb{E}[x])(y-\mathbb{E}[y])]\
-&amp;=\mathbb{E}[xy-\mathbb{E}[x]y-\mathbb{E}[y]x+\mathbb{E}[x]\mathbb{E}[y]]\
+</p>
+<div class="math">\begin{split}
+\text{cov}[x, y]&amp;=\mathbb{E}[(x-\mathbb{E}[x])(y-\mathbb{E}[y])]\\
+&amp;=\mathbb{E}[xy-\mathbb{E}[x]y-\mathbb{E}[y]x+\mathbb{E}[x]\mathbb{E}[y]]\\
 &amp;=\mathbb{E}[xy]-\mathbb{E}[x]\mathbb{E}[y]
-\end{split}</p>
+\end{split}</div>
 <h1>贝叶斯方法</h1>
 <h2>对模型参数的不同理解</h2>
 <ul>
@@ -131,9 +144,9 @@ $$\mathbb{E}_x[x,y]=\int xP(x, y)\text{d}x$$
 </ul>
 <h2>贝叶斯方法流程</h2>
 <ol>
-<li>写出似然函数 $P(\mathcal{D}|\omega)$，求其最大值，得到最大似然估计($\omega_{MLE}$)。</li>
-<li>对参数引入先验 $P(\omega)$，用贝叶斯公式得到后验概率 $P(\omega|\mathcal{D})\propto P(\omega)P(\mathcal{D}|\omega)$，最大化后验概率得最大后验解($\omega_{MAP}$)。</li>
-<li>引入输出在参数下的条件分布$P(y|\omega)$，利用贝叶斯公式得到输出和参数的联合概率$P(y, \omega|\mathcal{D})=P(\omega|\mathcal{D})P(y|\omega)$，并对$\omega$积分，得到预测分布$P(y|\mathcal{D})$，至此没有参数$\omega$，因此不会过拟合。</li>
+<li>写出似然函数 <span class="math">\(P(\mathcal{D}|\omega)\)</span>，求其最大值，得到最大似然估计(<span class="math">\(\omega_{MLE}\)</span>)。</li>
+<li>对参数引入先验 <span class="math">\(P(\omega)\)</span>，用贝叶斯公式得到后验概率 <span class="math">\(P(\omega|\mathcal{D})\propto P(\omega)P(\mathcal{D}|\omega)\)</span>，最大化后验概率得最大后验解(<span class="math">\(\omega_{MAP}\)</span>)。</li>
+<li>引入输出在参数下的条件分布<span class="math">\(P(y|\omega)\)</span>，利用贝叶斯公式得到输出和参数的联合概率<span class="math">\(P(y, \omega|\mathcal{D})=P(\omega|\mathcal{D})P(y|\omega)\)</span>，并对<span class="math">\(\omega\)</span>积分，得到预测分布<span class="math">\(P(y|\mathcal{D})\)</span>，至此没有参数<span class="math">\(\omega\)</span>，因此不会过拟合。</li>
 </ol>
 <h1>模型选择</h1>
 <p>两种思路：信息准则或交叉验证。</p>
@@ -153,9 +166,13 @@ $$\mathbb{E}_x[x,y]=\int xP(x, y)\text{d}x$$
 <h2>损失函数</h2>
 <p>损失函数是给定的，损失区域（损失函数的积分区域）是不定的。若是最小期望损失，则是积分较低的类后验概率与变量轴围成的区域。</p>
 <p>对于离散值：
-$$\mathbb{E}[L]=\sum_k\sum_j\int_{\mathcal{R}<em kj="kj">j}L</em>P(\mathbf{x}, \mathcal{C}_k)\text{d}\mathbf{x}$$
+</p>
+<div class="math">$$\mathbb{E}[L]=\sum_k\sum_j\int_{\mathcal{R}_j}L_{kj}P(\mathbf{x}, \mathcal{C}_k)\text{d}\mathbf{x}$$</div>
+<p>
 对于连续值：
-$$\mathbb{E}[L]=\int\int L(t, y(\mathbf{x}))P(\mathbf{x}, t)\text{d}\mathbf{x}\text{d}t$$
+</p>
+<div class="math">$$\mathbb{E}[L]=\int\int L(t, y(\mathbf{x}))P(\mathbf{x}, t)\text{d}\mathbf{x}\text{d}t$$</div>
+<p>
 利用损失函数的一般形式可以计算一些一般意义上的损失界问题。</p>
 <h2>判别函数、判别模型、生成模型</h2>
 <ul>
@@ -169,21 +186,83 @@ $$\mathbb{E}[L]=\int\int L(t, y(\mathbf{x}))P(\mathbf{x}, t)\text{d}\mathbf{x}\t
 <ul>
 <li>利用后验概率确定拒绝选项的标准</li>
 <li>补偿先验概率（人造平衡数据集进行学习模型后，对“平衡”这一假设进行补偿）：
-$$\frac{平衡后验}{平衡先验}\times实际先验=实际后验$$</li>
+<div class="math">$$\frac{平衡后验}{平衡先验}\times实际先验=实际后验$$</div>
+</li>
 <li>利用独立性学习组合模型</li>
 </ul>
 <h1>信息论</h1>
-<p><strong>熵</strong>是信息量 $\log{P(x)}$ 的负期望，为概率密度函数的范函，衡量变量所提供信息量的多少：
-$$\text{H}[x] = -\int P(x)\log{P(x)}\text{d}x$$
-<strong>KL散度</strong>是相对信息量 $\log{\frac{P(y)}{P(x}}$ 的负期望，为概率密度的范函，衡量两个分布的差距，非负：
-$$\text{KL}(P(x)||P(y))=-\int P(x)\log \frac{P(y)}{P(x)}\text{d}x$$
+<p><strong>熵</strong>是信息量 <span class="math">\(\log{P(x)}\)</span> 的负期望，为概率密度函数的范函，衡量变量所提供信息量的多少：
+</p>
+<div class="math">$$\text{H}[x] = -\int P(x)\log{P(x)}\text{d}x$$</div>
+<p>
+<strong>KL散度</strong>是相对信息量 <span class="math">\(\log{\frac{P(y)}{P(x}}\)</span> 的负期望，为概率密度的范函，衡量两个分布的差距，非负：
+</p>
+<div class="math">$$\text{KL}(P(x)||P(y))=-\int P(x)\log \frac{P(y)}{P(x)}\text{d}x$$</div>
+<p>
 <strong>互信息</strong>是一个KL散度，衡量变量的独立程度：
-$$\text{I}[x, y] = \text{KL}(P(x, y)||P(x)P(y))$$
+</p>
+<div class="math">$$\text{I}[x, y] = \text{KL}(P(x, y)||P(x)P(y))$$</div>
+<p>
 联系（由定义可证）：
-$$
+</p>
+<div class="math">$$
 \text{H}[x,y]=\text{H}[x] + \text{H}[y|x] = \text{H}[y] + \text{H}[x|y]
-$$
-$$\text{I}[x, y] =\text{H}[y]-\text{H}[y|x]=\text{H}[x]-\text{H}[x|y]$$</p>
+$$</div>
+<div class="math">$$\text{I}[x, y] =\text{H}[y]-\text{H}[y|x]=\text{H}[x]-\text{H}[x|y]$$</div>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+    
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
 
 
     </div>
@@ -196,9 +275,9 @@ $$\text{I}[x, y] =\text{H}[y]-\text{H}[y|x]=\text{H}[x]-\text{H}[x|y]$$</p>
                     <div class="col-xs-4 col-sm-3 col-md-3 col-lg-3">
                         <div class="footer-title">Sitemap</div>
                         <ul class="list-unstyled">
-                            <li><a href="http://fingertap.github.io/archives.html">Archives</a></li>
-                            <li><a href="http://fingertap.github.io/tags.html">Tags</a></li>
-                            <li><a href="http://fingertap.github.io/authors.html">Authors</a></li>
+                            <li><a href="/archives.html">Archives</a></li>
+                            <li><a href="/tags.html">Tags</a></li>
+                            <li><a href="/authors.html">Authors</a></li>
                         </ul>
                     </div>
                     <div class="col-xs-4 col-sm-3 col-md-3 col-lg-3">
