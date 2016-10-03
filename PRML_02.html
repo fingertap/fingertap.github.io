@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="第二章主要是给出具体的概率论方面的知识，包括一些分布的处理技巧以及一些分布常用的统计量。对于一个概率分布，掌握推导其归一化、期望和方差、最大似然估计分布参数的技巧一般就够了（当然还有KL散度、协方差等，用到的时候不多且技巧是类似的）。 常用分布 伯努立分布 对离散二元变量建模，参数为\(\mu\)。描述一次二值随机实验的结果情况（正or反）。 分布形式： ...">
+        <meta name="keywords" content="Machine Learning, Notes">
+        <link rel="icon" href="/favicon.ico">
+
+        <title>PRML Probability Distribution Note (To be cont.) - Fingertap</title>
+
+        <!-- Stylesheets -->
+        <link href="/theme/css/all.min.css" rel="stylesheet">
+        <!-- /Stylesheets -->
+
+        <!-- RSS Feeds -->
+        <!-- /RSS Feeds -->
+
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+
+    </head>
+
+    <body>
+
+        <!-- Header -->
+    <div class="header-container gradient">
+
+            <!-- Static navbar -->
+            <div class="container">
+                <div class="header-nav">
+                    <div class="header-logo">
+                        <a herf="/" class="pull-left"><img class="mr20" src="/images/logo.png" alt="logo"/></a>
+                        <a href="/" class="pull-left">Fingertap</a>
+                    </div>
+                    <div class="nav pull-right">
+                            <a href="/about.html">About</a>
+                            <a href="/categories.html">Categories</a>
+                    </div>
+                </div>
+            </div>
+            <!-- /Static navbar -->
+
+            <!-- Header -->
+    <!-- Header -->
+    <div class="container header-wrapper">
+        <div class="row">
+              <div class="col-lg-12">
+                  <div class="header-content">
+                      <h1 class="header-title">PRML Probability Distribution Note (To be cont.)</h1>
+                      <p class="header-date">By <a href="/author/han.html">Han</a>, 二 04 十月 2016, modified 二 04 十月 2016, in category <a href="/category/prml-notes.html">Prml notes</a></p>
+                      <div class="clearfix"></div>
+                      <p class="pull-right header-tags">
+                          <span class="glyphicon glyphicon-tags mr5" aria-hidden="true"></span>
+<a href="/tag/machine-learning.html">Machine Learning</a>, <a href="/tag/notes.html">Notes</a>                      </p>
+                  </div>
+              </div>
+        </div>
+    </div>
+    <!-- /Header -->
+            <!-- /Header -->
+
+        </div>
+        <!-- /Header -->
+
+
+        <!-- Content -->
+    <div class="container content">
+        <p>第二章主要是给出具体的概率论方面的知识，包括一些分布的处理技巧以及一些分布常用的统计量。对于一个概率分布，掌握推导其归一化、期望和方差、最大似然估计分布参数的技巧一般就够了（当然还有KL散度、协方差等，用到的时候不多且技巧是类似的）。</p>
+<h1>常用分布</h1>
+<h2>伯努立分布</h2>
+<p>对<strong>离散二元变量</strong>建模，参数为<span class="math">\(\mu\)</span>。描述一次二值随机实验的结果情况（正or反）。</p>
+<h3>分布形式：</h3>
+<div class="math">$$P(x|\mu)=\mu^x(1-\mu)^{1-x}$$</div>
+<h3>归一化：</h3>
+<div class="math">$$P(0|\mu) + P(1|\mu)=\mu+1-\mu=1$$</div>
+<h3>期望：</h3>
+<div class="math">$$\mathbb{E}[x]=0\times P(0|\mu)+1\times P(1|\mu) = \mu$$</div>
+<h3>方差：</h3>
+<div class="math">$$\text{var}[x]=\mathbb{E}[x^2]-\mathbb{E}[x]^2=\mu-\mu^2=\mu(1-\mu)$$</div>
+<h2>二项分布</h2>
+<p>对<strong>离散多元变量</strong>建模，参数为<span class="math">\(N\)</span>，<span class="math">\(\mu\)</span>。描述多次伯努力实验的结果情况（多少次为正）。</p>
+<h3>分布形式</h3>
+<div class="math">$$P(m|N,\mu) = \binom{N}{m}\mu^m(1-\mu)^{1-m}$$</div>
+<h3>归一化</h3>
+<p>归一化需要用到二项式定理。组合数定义<span class="math">\(\binom{N}{m}=N!/(N-m)!m!\)</span>，为从<span class="math">\(N\)</span>个对象中随机抽取<span class="math">\(m\)</span>个对象的策略数，满足
+</p>
+<div class="math">$$\binom{N}{m}+\binom{N}{m-1}=\binom{N+1}{m}$$</div>
+<p>
+上式从定义可以简单证明。二项式定理：
+</p>
+<div class="math">$$(1+x)^N=\sum_{m=0}^N\binom{N}{m}x^m$$</div>
+<p>
+上式可通过数学归纳得到：
+</p>
+<div class="math">\begin{split}
+(1+x)^{N+1}&amp;=(1+x)^N(1+x)\\
+&amp;=\bigg[\sum_{m=0}^N\binom{N}{m}x^m\bigg](1+x)\\
+&amp;=1+\sum_{m=1}^N\bigg[\binom{N}{m}+\binom{N}{m-1}\bigg]x^m+x^{N+1}\\
+&amp;=\sum_{m=0}^{N+1}\binom{N+1}{m}x^m
+\end{split}</div>
+<p>
+二项分布归一化形式
+</p>
+<div class="math">\begin{split}
+\sum_{m=0}^N\binom{N}{m}\mu^m(1-\mu)^{N-m}&amp;=(1-\mu)^N\sum_{m=0}^N\binom{N}{m}\bigg(\frac{\mu}{1-\mu}\bigg)^m\\
+&amp;=(1-\mu)^N\cdot\bigg(1+\frac{\mu}{1-\mu}\bigg)^N\\
+&amp;=1
+\end{split}</div>
+<h3>期望</h3>
+<p>对于指数族分布，往往可以通过对归一化式两边同时求导得到想要的期望形式。对归一化式两侧求<span class="math">\(\mu\)</span>的导数：
+</p>
+<div class="math">$$\sum_{m=0}^N\binom{N}{m}\mu^{m-1}(1-\mu)^{N-m-1}\cdot(m-N\mu)=0$$</div>
+<p>
+上式两侧同时乘以<span class="math">\(\mu(1-\mu)\)</span>并整理得
+</p>
+<div class="math">$$\mathbb{E}[m]=\sum_{m=0}^N\binom{N}{m}\mu^{m}(1-\mu)^{N-m}\cdot m=N\mu$$</div>
+<h3>方差</h3>
+<p>对期望式求对<span class="math">\(\mu\)</span>的导数得
+</p>
+<div class="math">$$\sum_{m=0}^N\binom{N}{m}\mu^{m-1}(1-\mu)^{N-m-1}\cdot(m^2-Nm\mu)=N$$</div>
+<p>
+上式两侧同时乘上<span class="math">\(\mu(1-\mu)\)</span>并整理得
+</p>
+<div class="math">$$\mathbb{E}[m^2]=N^2\mu^2+N\mu(1-\mu),$$</div>
+<p>
+即有方差
+</p>
+<div class="math">$$\text{var}[m]=\mathbb{E}[m^2]-\mathbb{E}[m]^2=N\mu(1-\mu)$$</div>
+<h2>Beta分布</h2>
+<p>对<strong>[0, 1]区间的连续变量</strong>建模，参数为两实数<span class="math">\(a\)</span>，<span class="math">\(b\)</span>。是对二项分布的参数<span class="math">\(\mu\)</span>引入的共轭先验分布（因为含有<span class="math">\(N\)</span>的项比较复杂，所以PRML没有对<span class="math">\(N\)</span>引入对应的先验）。</p>
+<h3>分布形式</h3>
+<div class="math">$$P(\mu|a, b)=\frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)}\mu^{a-1}(1-\mu)^{b-1},$$</div>
+<p>
+其中Gamma函数是广义阶乘<span class="math">\(\Gamma(x)=\int_0^\infty u^{x-1}e^{-u}\text{d}u\)</span>，满足<span class="math">\(\Gamma(x+1)=(x+1)\Gamma(x)\)</span>。</p>
+<h3>归一化</h3>
+<div class="math">\begin{split}
+\Gamma(a)\Gamma(b)&amp;=\int_0^\infty x^{a-1}e^{-x}\text{d}x\int_0^\infty y^{a-1}e^{-y}\text{d}y\\
+\end{split}</div>
+<p>
+与分布形式中含<span class="math">\(\mu\)</span>项对比，令<span class="math">\(x=k\mu\)</span>，<span class="math">\(y=k(1-\mu)\)</span>，得到
+</p>
+<div class="math">\begin{split}
+\Gamma(a)\Gamma(b)&amp;=\int_0^\infty x^{a-1}e^{-x}\text{d}x\int_0^\infty y^{a-1}e^{-y}\text{d}y\\
+&amp;=\int_{0}^\infty e^{-k}k^{a+b-2}\cdot k\text{d}k\int_0^1\mu^{a-1}（1-\mu）^{b-1} \text{d}\mu\\
+&amp;=\Gamma(a+b)\int_0^1\mu^{a-1}(1-\mu)^{b-1} \text{d}\mu
+\end{split}</div>
+<p>
+即有
+</p>
+<div class="math">$$\frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)}\int_0^1\mu^{a-1}(1-\mu)^{b-1}\text{d}\mu=1$$</div>
+<h3>期望</h3>
+<p>考察导数<span class="math">\(\big[\mu^a(1-\mu)^b\big]'=\mu^{a-1}(1-\mu)^{b-1}\big[a-(a+b)\mu\big]\)</span>，对其左右两侧求<span class="math">\([0, 1]\)</span>的积分有
+</p>
+<div class="math">$$\mu^a(1-\mu)^b\bigg|^1_0=0=\int_0^1\mu^{a-1}(1-\mu)^{b-1}\big[a-(a+b)\mu\big]$$</div>
+<p>
+整理得
+</p>
+<div class="math">\begin{split}
+\mathbb{E}[\mu]&amp;=\frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)}\int_0^1\mu^{a-1}(1-\mu)^{b-1}\cdot\mu\text{d}\mu\\
+&amp;=\frac{a}{a+b}
+\end{split}</div>
+<h3>方差</h3>
+<p>考察导数<span class="math">\(\big[\mu^{a+1}(1-\mu)^b\big]'=\mu^{a}(1-\mu)^{b-1}\big[a+1-(a+b+1)\mu\big]\)</span>，对其左右两侧求<span class="math">\([0, 1]\)</span>的积分有
+</p>
+<div class="math">$$\mu^{a+1}(1-\mu)^b\bigg|^1_0=0=\mu^{a-1}(1-\mu)^{b-1}\big[(a+1)\mu-(a+b+1)\mu^2\big]$$</div>
+<p>
+整理得
+</p>
+<div class="math">\begin{split}
+\mathbb{E}[\mu^2]&amp;=\frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)}\int_0^1\mu^{a-1}(1-\mu)^{b-1}\cdot\mu^2\text{d}\mu\\
+&amp;=\frac{a(a+1)}{(a+b)(a+b+1)}
+\end{split}</div>
+<p>
+即有方差
+</p>
+<div class="math">$$\text{var}[\mu]=\mathbb{E}[\mu^2]-\mathbb{E}[\mu]^2=\frac{ab}{(a+b)^2(a+b+1)}$$</div>
+<h2>伯努立分布扩展</h2>
+<p>对<strong>离散多元变量建模</strong>，由参数<span class="math">\(\boldsymbol\mu\)</span>控制取到每个值的概率。</p>
+<h3>分布形式</h3>
+<div class="math">$$P(\mathbf{x}|\boldsymbol\mu)=\prod_{k=1}^K\mu_k^{x_k},$$</div>
+<p>
+其中<span class="math">\(\mathbf{x}\)</span>用1-OF-K表示法，<span class="math">\(\mathbf{x}=(0, 0, 1, 0, 0, 0)^\text{T}\)</span>，总共有<span class="math">\(K\)</span>个类。</p>
+<h3>归一化</h3>
+<div class="math">$$\sum_\mathbf{x}p(\mathbf{x}|\boldsymbol\mu)=\sum_{k=1}^K\mu_k=1$$</div>
+<h3>期望</h3>
+<div class="math">$$\mathbb{E}[\mathbf{x}|\boldsymbol\mu]=\sum_{\mathbf{x}}P(\mathbf{x}|\boldsymbol\mu)\mathbf{x}=\boldsymbol\mu$$</div>
+<h3>协方差</h3>
+<div class="math">\begin{split}
+\text{cov}[\mathbf{x}]&amp;=\mathbb{E}[\mathbf{x}^\text{T}\mathbf{x}]-\mathbb{E}[\mathbf{x}]^\text{T}\mathbb{E}[\mathbf{x}]\\
+&amp;=\sum_{\mathbf{x}}P(\mathbf{x}|\boldsymbol\mu)\mathbf{x}^\text{T}\mathbf{x}-\boldsymbol\mu^\text{T}\boldsymbol\mu\\
+&amp;=\Sigma,
+\end{split}</div>
+<p>
+其中
+</p>
+<div class="math">$$
+\Sigma_{ij}=
+\begin{cases}
+\mu_i(1-\mu_i),&amp;\text{if $i=j$},\\
+-\mu_i\mu_j, &amp;\text{otherwise.}
+\end{cases}
+$$</div>
+<h2>多项分布</h2>
+<p>对<strong>多元多维离散变量</strong>建模，参数为<span class="math">\(N\)</span>和<span class="math">\(\boldsymbol\mu\)</span>。定义为N次“掷色子”实验各面朝上的次数，是二项分布的延伸。</p>
+<h3>分布形式</h3>
+<div class="math">$$P(\mathbf{m}|\boldsymbol\mu, N)=\binom{N}{\mathbf{m}}\prod_{k=1}^K\mu_k^{m_k},$$</div>
+<p>
+其中<span class="math">\(\binom{N}{\mathbf{m}}=N!/\prod_{k=1}^Km_k!\)</span>，<span class="math">\(\sum_km_k=N\)</span>。</p>
+<h3>归一化</h3>
+<p>以下为了方便表示，记<span class="math">\(\sum_{i}^lw_i\)</span>作<span class="math">\(\sum w_l\)</span> 。利用二项式定理，从最后一项开始求和得
+</p>
+<div class="math">\begin{split}
+&amp;~~~~~~\sum_{m_1=0}^N\sum_{m_{2}=0}^{N-m_1}\cdots\sum_{m_{K-1}=0}^{N-\sum m_{K-2}}\frac{N!}{m_1!\cdots m_{K-1}!(N-\sum m_{K-1})!}\bigg(\prod_{k=1}^{K-1}\mu_k^{m_k}\bigg)\big(1-\sum \mu_{K-1}\big)^{N-\sum m_{K-1}}\\
+&amp;=\sum_{m_1=0}^N\cdots\frac{N!}{m_1!\cdots m_{K-2}!(N-\sum m_{K-2})!}\bigg(\prod_{k=1}^{K-2}\mu_k^{m_k}\bigg)\big(1-\sum \mu_{K-1}\big)^{N-\sum m_{K-2}}\\
+&amp;~~~~~~\sum_{m_{K-1}=0}^{N-\sum m_{K-2}}\binom{N-\sum m_{K-2}}{m_{K-1}}\bigg(\frac{\mu_{K-1}}{1-\sum \mu_{K-1}}\bigg)^{N-\sum{m_{K-2}}}\\
+&amp;=\sum_{m_1=0}^N\cdots\frac{N!}{m_1!\cdots m_{K-2}!(N-\sum m_{K-2})!}\bigg(\prod_{k=1}^{K-2}\mu_k^{m_k}\bigg)\big(1-\sum \mu_{K-2}\big)^{N-\sum m_{K-2}}\\
+&amp;=1
+\end{split}</div>
+<h3>期望</h3>
+<p>依据对称性，期望的各项应该具有一致的形式，因此只用考察其中一项即可，这里选择倒数第二项<span class="math">\(m_{K-1}\)</span>，而<span class="math">\(m_K=N-\sum_{k=1}^Km_k\)</span>。
+</p>
+<div class="math">\begin{split}
+\mathbb{E}[\mathbf{m}]_K&amp;=\sum_{m_1=0}^N\sum_{m_2=0}^{N-m_1}\cdots\bigg(\prod_{k=1}^{K-2}\mu_k^{m_k}\bigg)\sum_{m_{K-1}=0}^{N-\sum m_{K-2}}\frac{N!}{m_1!\cdots m_{K-1}!(N-\sum m_{K-1})!}\\
+&amp;~~~~~~\mu_{K-1}^{m_{K-1}}\big(1-\sum \mu_{K-1}\big)^{N-\sum m_{K-1}}\cdot m_{K-1}\\
+\end{split}</div>
+<p>
+在二项式定理侧取对<span class="math">\(x\)</span>的导数并两边同时乘上<span class="math">\(x\)</span>有
+</p>
+<div class="math">$$N(1+x)^{N-1}x=\sum_{m=0}^N\binom{N}{m}mx^m$$</div>
+<p>
+带入上式有
+</p>
+<div class="math">\begin{split}
+\mathbb{E}[\mathbf{m}]_K&amp;=\sum_{m_1=0}^N\sum_{m_2=0}^{N-m_1}\cdots\bigg(\prod_{k=1}^{K-2}\mu_k^{m_k}\bigg)\frac{N!}{m_1!\cdots m_{K-2}!}\cdot\frac{1}{(N-\sum m_{K-2})!}\\
+&amp;~~~~~~(N-\sum m_{K-2})\big(1+\frac{\mu_{K-1}}{1-\sum \mu_{K-1}}\big)^{N-\sum m_{K-2}-1}\frac{\mu_{K-1}}{1-\sum \mu_{K-1}}\big(1-\sum \mu_{K-1}\big)^{N-\sum m_{K-2}}\\
+&amp;= \mu_{K-1}\sum_{m_1=0}^N\cdots\bigg(\prod_{k=1}^{K-3}\mu_k^{m_k}\bigg)\frac{N!}{m_1!\cdots m_{K-3}!}\sum_{m_{K-2}=0}^{N-\sum m_{K-3}}\frac{1}{(N-\sum m_{K-3})!}\binom{N-\sum m_{K-3}}{m_{K-2}}\\
+&amp;~~~~~~\big(N-\sum m_{K-2}\big)\big(1-\sum \mu_{K-2}\big)^{N-\sum m_{K-2}-1}\mu_{K-2}^{m_{K-2}}
+\end{split}</div>
+<p>
+再次使用二项式定理及其引理
+</p>
+<div class="math">\begin{split}
+\mathbb{E}[\mathbf{m}]_K&amp;=\mu_{K-1}\sum_{m_1=0}^N\cdots\bigg(\prod_{k=1}^{K-3}\mu_k^{m_k}\bigg)\frac{N!}{m_1!\cdots m_{K-3}!(N-\sum m_{K-3})!}\\
+&amp;~~~~~~(1-\sum \mu_{K-2})^{N-\sum m_{K-3}-1}\big(N-\sum m_{K-3}\big)\cdot\\
+&amp;~~~~~~\bigg\{\bigg(\frac{1-\sum \mu_{K-3}}{1-\sum_{K-2}}\bigg)^{N-\sum m_{K-3}}
+-\frac{\mu_{K-2}}{1-\sum\mu_{K-2}}\bigg(\frac{1-\sum \mu_{K-3}}{1-\sum \mu_{K-2}}\bigg)^{N-\sum m_{K-3}-1}\bigg\}\\
+&amp;= \mu_{K-1}\sum_{m_1=0}^N\cdots\bigg(\prod_{k=1}^{K-4}\mu_k^{m_k}\bigg)\frac{N!}{m_1!\cdots m_{K-4}!}\sum_{m_{K-3}=0}^{N-\sum m_{K-4}}\frac{1}{(N-\sum m_{K-4})!}\binom{N-\sum m_{K-4}}{m_{K-3}}\\
+&amp;~~~~~~\big(N-\sum m_{K-3}\big)\big(1-\sum \mu_{K-3}\big)^{N-\sum m_{K-2}-1}\mu_{K-3}^{m_{K-3}}\\
+&amp;=N\mu_{K-1}
+\end{split}</div>
+<p>
+因此期望为
+</p>
+<div class="math">$$\mathbb{E}[\mathbf{x}|\boldsymbol\mu, N]=N\mu$$</div>
+<h3>协方差</h3>
+<p>用类似的方法，从最后一项开始求和。协方差矩阵分成对角线上的项和非协方差矩阵上的项计算
+</p>
+<div class="math">\begin{split}
+\text{cov}[\mathbf{x}]_{ij}=
+\begin{cases}
+N\mu_i(1-\mu_i), &amp;\text{if i = j,}\\
+-N\mu_i\mu_j, &amp;\text{otherwise.}
+\end{cases}
+\end{split}</div>
+<h2>狄利克雷分布</h2>
+<p>对<strong>多维<span class="math">\([0, 1]\)</span>间连续变量</strong>建模，参数为<span class="math">\(\boldsymbol\alpha\)</span>，为多项分布的共轭先验，此分布仍只是对<span class="math">\(\boldsymbol\mu\)</span>引入先验而没有对N引入先验。</p>
+<h2>分布形式</h2>
+<div class="math">$$P(\boldsymbol\mu|\boldsymbol\alpha)=\frac{\Gamma(\alpha_0)}{\Gamma(\alpha_1)\cdots\Gamma(\alpha_K)}\prod_{k=1}^K\mu_k^{\alpha_k-1}$$</div>
+<p>
+其中<span class="math">\(\mu_k\in[0, 1]\)</span>，<span class="math">\(\sum_k\mu_k=1\)</span>，<span class="math">\(\alpha_0=\sum_{k=1}^K\alpha_k\)</span>。</p>
+<h2>归一化</h2>
+<div class="math">\begin{split}
+\int_0^1\text{d}\mu_1\int_0^{1-\mu_1}\text{d}\mu_2\cdots\bigg(\prod_{k=1}^{K-2}\mu_k^{\alpha_{k-1}}\bigg)\int_0^{1-\sum \mu_{K-2}}\mu_{K-1}^{\alpha_{K-1}-1}\big(1-\sum \mu_{K-1}\big)^{\alpha_K-1}\text{d}\mu_{K-1}
+\end{split}</div>
+<p>
+因为积分中会涉及0到非1的积分区间，为了利用二项分布中的结果，令<span class="math">\(t=\frac{\mu_{K-1}}{1-\sum \mu_{K-1}}\in[0, 1]\)</span>，则上式可化为
+</p>
+<div class="math">\begin{split}
+&amp;~~~~~~\int_0^1\text{d}\mu_1\int_0^{1-\mu_1}\text{d}\mu_2\cdots\bigg(\prod_{k=1}^{K-2}\mu_k^{\alpha_{k-1}}\bigg)\int_0^{1-\sum \mu_{K-2}}\mu_{K-1}^{\alpha_{K-1}-1}\big(1-\sum \mu_{K-1}\big)^{\alpha_K-1}\text{d}\mu_{K-1}\\
+&amp;=\int_0^1\text{d}\mu_1\cdots\bigg(\prod_{k=1}^{K-2}\mu_k^{\alpha_{k-1}}\bigg)\int_0^1t^{\alpha_{K-1}-1}\big(1-\sum \mu_{K-2}\big)^{\alpha_{K-1}}\bigg\{1-\sum \mu_{K-2}-t\big(1-\sum \mu_{K-2}\big)\bigg\}^{\alpha_K-1}\text{d}t\\
+&amp;=\frac{\Gamma(\alpha_{K})\Gamma(\alpha_{K-1})}{\Gamma(\alpha_K+\alpha_{K-1})}\int_0^1\text{d}\mu_1\cdots\bigg(\prod_{k=1}^{K-3}\mu_k^{\alpha_{k-1}-1}\bigg)\int_0^{1-\sum \mu_{K-3}}\mu_{K-2}^{\alpha_{K-2}-1}\big(1-\sum \mu_{K-2}\big)^{\alpha_K+\alpha_{K+1}-1}\text{d}\mu_{K-2}\\
+&amp;=\frac{\Gamma(\alpha_1)\cdots{\Gamma(\alpha_K)}}{\Gamma(\alpha_0)}
+\end{split}</div>
+<p>
+归一化得证。</p>
+<h3>期望</h3>
+<h3>协方差</h3>
+<h2>高斯分布</h2>
+<h1>高斯分布的几个常用结果</h1>
+<h1>非参数化建模方法估计概率密度</h1>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+        	<style>
+#pcs-comment-form input,
+#pcs-comment-form textarea {
+	width: 100%;
+}
+#pcs-comment-form-display-replyto {
+	border: solid 1px black;
+	padding: 2px;
+}
+#pcs-comment-form-display-replyto p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+#pcs-comments ul {
+	list-style: none;
+}
+#pcs-comments .comment-left {
+	display: table-cell;
+	padding-right: 10px;
+}
+#pcs-comments .comment-body {
+	display: table-cell;
+	vertical-align: top;
+	width: 100%;
+}
+</style>
+
+	<section id="pcs-comments">
+	<header>
+		<h2>Comments</h2>
+		<hr/>
+	</header>
+		<p>There are no comments yet.</p>
+	<section>
+	<form id="pcs-comment-form" action="#">
+		<legend>Add a Comment</legend>
+		<input type="hidden" id="pcs-comment-form-input-replyto">
+		<fieldset>
+			<label for="pcs-comment-form-input-name">Name</label>
+			<input  id="pcs-comment-form-input-name" type="text" placeholder="Enter your name or nickname" />
+		</fieldset>
+		<fieldset>
+			<label for="pcs-comment-form-input-website">Website</label>
+			<input  id="pcs-comment-form-input-website" type="text" placeholder="Enter your website (optional)" />
+		</fieldset>
+		<fieldset>
+			<label   for="pcs-comment-form-input-textarea">Your Comment</label>
+			<textarea id="pcs-comment-form-input-textarea" rows="5" style="resize:vertical;" placeholder="Your comment"></textarea>
+			<p>You can use the <a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a> syntax to format your comment.</p>
+			<div style="display: none; " id="pcs-comment-form-display-replyto"></div>
+		</fieldset>
+
+		<button type="submit"
+				id="pcs-comment-form-button-submit"
+				>Post via email</button>
+
+	</form>
+</section>
+
+</section>
+
+			<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+	<script type="text/javascript" src="/theme/js/comments.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			CommentSystem.email_user   = "zh950713";
+			CommentSystem.email_domain = "gmail.com";
+			CommentSystem.display_replyto_html = function(comment_content, article_slug, author) { 
+				return ''
+					+ '<button style="float:right;" onclick="CommentSystem.cancelReply(); return false;" title="Cancel the reply">'
+					+ 	'×'
+					+ '</button>'
+					+ '<p>This comment will be posted as a reply to \'<a title="'+comment_content+'" href="#comment-'+article_slug+'">'+author+'</a>\'</p>';
+			};
+
+			$('#pcs-comment-form').on("submit",
+				function( event )
+				{
+					event.preventDefault();
+					$(location).attr('href', CommentSystem.getMailtoLink("PRML_02"));
+				}
+			);
+		});
+	</script>
+
+
+
+
+
+
+    </div>
+        <!-- /Content --> 
+
+        <!-- Footer -->
+        <div class="footer gradient-2">
+            <div class="container footer-container ">
+                <div class="row">
+                    <div class="col-xs-4 col-sm-3 col-md-3 col-lg-3">
+                        <div class="footer-title">Sitemap</div>
+                        <ul class="list-unstyled">
+                            <li><a href="/archives.html">Archives</a></li>
+                            <li><a href="/tags.html">Tags</a></li>
+                            <li><a href="/authors.html">Authors</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-4 col-sm-3 col-md-3 col-lg-3">
+                    </div>
+                    <div class="col-xs-4 col-sm-3 col-md-3 col-lg-3">
+                    </div> 
+                    <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                        <p class="pull-right text-right">
+                            <small>&copy; Copyright 2015, Fingertap.</small>
+                            <small><em>Created using <a href="http://docs.getpelican.com/" target="_blank">pelican</a></em></small><br/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /Footer -->
+    </body>
+</html>
