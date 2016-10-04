@@ -113,7 +113,7 @@
 &amp;=1
 \end{split}</div>
 <h3>期望</h3>
-<p>对于指数族分布，往往可以通过对归一化式两边同时求导得到想要的期望形式。对归一化式两侧求<span class="math">\(\mu\)</span>的导数：
+<p>对归一化式两侧求<span class="math">\(\mu\)</span>的导数：
 </p>
 <div class="math">$$\sum_{m=0}^N\binom{N}{m}\mu^{m-1}(1-\mu)^{N-m-1}\cdot(m-N\mu)=0$$</div>
 <p>
@@ -270,11 +270,11 @@ N\mu_i(1-\mu_i), &amp;\text{if i = j,}\\
 \end{split}</div>
 <h2>狄利克雷分布</h2>
 <p>对<strong>多维<span class="math">\([0, 1]\)</span>间连续变量</strong>建模，参数为<span class="math">\(\boldsymbol\alpha\)</span>，为多项分布的共轭先验，此分布仍只是对<span class="math">\(\boldsymbol\mu\)</span>引入先验而没有对N引入先验。</p>
-<h2>分布形式</h2>
+<h3>分布形式</h3>
 <div class="math">$$P(\boldsymbol\mu|\boldsymbol\alpha)=\frac{\Gamma(\alpha_0)}{\Gamma(\alpha_1)\cdots\Gamma(\alpha_K)}\prod_{k=1}^K\mu_k^{\alpha_k-1}$$</div>
 <p>
 其中<span class="math">\(\mu_k\in[0, 1]\)</span>，<span class="math">\(\sum_k\mu_k=1\)</span>，<span class="math">\(\alpha_0=\sum_{k=1}^K\alpha_k\)</span>。</p>
-<h2>归一化</h2>
+<h3>归一化</h3>
 <div class="math">\begin{split}
 \int_0^1\text{d}\mu_1\int_0^{1-\mu_1}\text{d}\mu_2\cdots\bigg(\prod_{k=1}^{K-2}\mu_k^{\alpha_{k-1}}\bigg)\int_0^{1-\sum \mu_{K-2}}\mu_{K-1}^{\alpha_{K-1}-1}\big(1-\sum \mu_{K-1}\big)^{\alpha_K-1}\text{d}\mu_{K-1}
 \end{split}</div>
