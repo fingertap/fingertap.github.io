@@ -226,7 +226,7 @@ $$</div>
 <p>依据对称性，期望的各项应该具有一致的形式，因此只用考察其中一项即可，这里选择倒数第二项<span class="math">\(m_{K-1}\)</span>，而<span class="math">\(m_K=N-\sum_{k=1}^Km_k\)</span>。
 </p>
 <div class="math">\begin{split}
-\mathbb{E}[\mathbf{m}]_K&amp;=\sum_{m_1=0}^N\sum_{m_2=0}^{N-m_1}\cdots\bigg(\prod_{k=1}^{K-2}\mu_k^{m_k}\bigg)\sum_{m_{K-1}=0}^{N-\sum m_{K-2}}\frac{N!}{m_1!\cdots m_{K-1}!(N-\sum m_{K-1})!}\\
+\mathbb{E}[\mathbf{m}]_{K-1}&amp;=\sum_{m_1=0}^N\sum_{m_2=0}^{N-m_1}\cdots\bigg(\prod_{k=1}^{K-2}\mu_k^{m_k}\bigg)\sum_{m_{K-1}=0}^{N-\sum m_{K-2}}\frac{N!}{m_1!\cdots m_{K-1}!(N-\sum m_{K-1})!}\\
 &amp;~~~~~~\mu_{K-1}^{m_{K-1}}\big(1-\sum \mu_{K-1}\big)^{N-\sum m_{K-1}}\cdot m_{K-1}\\
 \end{split}</div>
 <p>
@@ -257,7 +257,7 @@ $$</div>
 <p>
 因此期望为
 </p>
-<div class="math">$$\mathbb{E}[\mathbf{x}|\boldsymbol\mu, N]=N\mu$$</div>
+<div class="math">$$\mathbb{E}[\mathbf{x}|\boldsymbol\mu, N]=N\boldsymbol\mu$$</div>
 <h3>协方差</h3>
 <p>用类似的方法，从最后一项开始求和。协方差矩阵分成对角线上的项和非协方差矩阵上的项计算
 </p>
