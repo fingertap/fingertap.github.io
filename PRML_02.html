@@ -237,7 +237,7 @@ $$</div>
 带入上式有
 </p>
 <div class="math">\begin{split}
-\mathbb{E}[\mathbf{m}]_K&amp;=\sum_{m_1=0}^N\sum_{m_2=0}^{N-m_1}\cdots\bigg(\prod_{k=1}^{K-2}\mu_k^{m_k}\bigg)\frac{N!}{m_1!\cdots m_{K-2}!}\cdot\frac{1}{(N-\sum m_{K-2})!}\\
+\mathbb{E}[\mathbf{m}]_{K-1}&amp;=\sum_{m_1=0}^N\sum_{m_2=0}^{N-m_1}\cdots\bigg(\prod_{k=1}^{K-2}\mu_k^{m_k}\bigg)\frac{N!}{m_1!\cdots m_{K-2}!}\cdot\frac{1}{(N-\sum m_{K-2})!}\\
 &amp;~~~~~~(N-\sum m_{K-2})\big(1+\frac{\mu_{K-1}}{1-\sum \mu_{K-1}}\big)^{N-\sum m_{K-2}-1}\frac{\mu_{K-1}}{1-\sum \mu_{K-1}}\big(1-\sum \mu_{K-1}\big)^{N-\sum m_{K-2}}\\
 &amp;= \mu_{K-1}\sum_{m_1=0}^N\cdots\bigg(\prod_{k=1}^{K-3}\mu_k^{m_k}\bigg)\frac{N!}{m_1!\cdots m_{K-3}!}\sum_{m_{K-2}=0}^{N-\sum m_{K-3}}\frac{1}{(N-\sum m_{K-3})!}\binom{N-\sum m_{K-3}}{m_{K-2}}\\
 &amp;~~~~~~\big(N-\sum m_{K-2}\big)\big(1-\sum \mu_{K-2}\big)^{N-\sum m_{K-2}-1}\mu_{K-2}^{m_{K-2}}
@@ -246,7 +246,7 @@ $$</div>
 再次使用二项式定理及其引理
 </p>
 <div class="math">\begin{split}
-\mathbb{E}[\mathbf{m}]_K&amp;=\mu_{K-1}\sum_{m_1=0}^N\cdots\bigg(\prod_{k=1}^{K-3}\mu_k^{m_k}\bigg)\frac{N!}{m_1!\cdots m_{K-3}!(N-\sum m_{K-3})!}\\
+\mathbb{E}[\mathbf{m}]_{K-1}&amp;=\mu_{K-1}\sum_{m_1=0}^N\cdots\bigg(\prod_{k=1}^{K-3}\mu_k^{m_k}\bigg)\frac{N!}{m_1!\cdots m_{K-3}!(N-\sum m_{K-3})!}\\
 &amp;~~~~~~(1-\sum \mu_{K-2})^{N-\sum m_{K-3}-1}\big(N-\sum m_{K-3}\big)\cdot\\
 &amp;~~~~~~\bigg\{\bigg(\frac{1-\sum \mu_{K-3}}{1-\sum_{K-2}}\bigg)^{N-\sum m_{K-3}}
 -\frac{\mu_{K-2}}{1-\sum\mu_{K-2}}\bigg(\frac{1-\sum \mu_{K-3}}{1-\sum \mu_{K-2}}\bigg)^{N-\sum m_{K-3}-1}\bigg\}\\
