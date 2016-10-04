@@ -290,7 +290,27 @@ N\mu_i(1-\mu_i), &amp;\text{if i = j,}\\
 <p>
 归一化得证。</p>
 <h3>期望</h3>
+<p>先对<span class="math">\(\mu_k(k\neq j)\)</span>积分，这和归一化一致
+</p>
+<div class="math">$$\mathbb{E}[\mu_j]=\frac{\prod_{k\neq j}\Gamma(\alpha_k)}{\Gamma(\sum_{k!=j}\alpha_k)}
+\cdot\frac{\Gamma(\alpha_0)}{\prod_k\Gamma(\alpha_k)}\int_0^1\mu_j^{\alpha_j}\big(1-\mu_j\big)^{\sum_k\neq j\alpha_k -1}\text{d}\mu_j$$</div>
+<p>
+利用Beta分布的期望结果，可以得到
+</p>
+<div class="math">$$\mathbb{E}[\mu_j]=\frac{\alpha_j}{\alpha_0}$$</div>
 <h3>协方差</h3>
+<p>先对<span class="math">\(\mu_k(k\neq i, j)\)</span>积分，得
+</p>
+<div class="math">$$
+\text{cov}[\mu_i\mu_j]=\frac{\Gamma(\alpha_0)}{\Gamma(\sum_{k\neq i, j}\alpha_k)\Gamma(\alpha_i)\Gamma(\alpha_j)}\int_0^1\mu_i^{\alpha_i}\text{d}\mu_i\int_0^{1-\mu_i}\mu_j^{\alpha_j}(1-\mu_i - \mu_j)^{\sum_{k\neq i, j}\alpha_k-1}\text{d}\mu_j
+$$</div>
+<p>
+利用二项分布方差结果
+</p>
+<div class="math">$$\text{cov}[\mu_i\mu_j]=\begin{cases}
+\frac{\alpha_j(\alpha_0-\alpha_j)}{\alpha_0^2(\alpha_0+1)}, &amp;\text{if i=j,}\\
+-\frac{\alpha_i\alpha_j}{\alpha_0^2(\alpha_0+1)}, &amp;\text{otherwise.}
+\end{cases}$$</div>
 <h2>高斯分布</h2>
 <h1>高斯分布的几个常用结果</h1>
 <h1>非参数化建模方法估计概率密度</h1>
