@@ -312,7 +312,65 @@ $$</div>
 -\frac{\alpha_i\alpha_j}{\alpha_0^2(\alpha_0+1)}, &amp;\text{otherwise.}
 \end{cases}$$</div>
 <h2>高斯分布</h2>
+<p>对<strong><span class="math">\(\mathbb{R}\)</span>上的单维或多维连续变量</strong>建模，参数为<span class="math">\(\boldsymbol\mu\)</span>和<span class="math">\(\boldsymbol\Sigma\)</span>。在很多地方都挺有用的，不知道具体分布的连续变量很多都假设为高斯分布（或许是因为熵最大）。</p>
+<h3>分布形式</h3>
+<p>这里只关注多维的高斯分布，其形式为
+</p>
+<div class="math">$$\mathcal{N}(\mathbf{x}|\boldsymbol\mu, \boldsymbol\Sigma)=\frac{1}{(2\pi)^{D/2}|\boldsymbol\Sigma|^{1/2}}\exp \bigg\{-\frac{1}{2}(\mathbf{x}-\boldsymbol\mu)^{\text{T}}\boldsymbol\Sigma^{-1}(\mathbf{x}-\boldsymbol\mu)\bigg\},$$</div>
+<p>
+其中<span class="math">\(D\)</span>是变量的维度。</p>
+<h3>归一化</h3>
+<p>和单维的高斯分布的归一化一样，这里需要用换元将均值<span class="math">\(\boldsymbol\mu\)</span>从积分中移除，同时这里的协方差矩阵也需要一并从积分形式中消去。为了完成这一点，考察指数中的马氏距离
+</p>
+<div class="math">$$\Delta^2 = (\mathbf{x}-\boldsymbol\mu)^{\text{T}}\boldsymbol\Sigma^{-1}(\mathbf{x}-\boldsymbol\mu)$$</div>
+<p>
+用对称矩阵分解
+</p>
+<div class="math">$$\boldsymbol\Sigma^{-1}=\sum_{i=1}^D\frac{1}{\lambda_i}\mathbf{u}_i\mathbf{u}_j$$</div>
+<p>，
+其中<span class="math">\(\lambda_i\)</span>和<span class="math">\(\mathbf{u}_i\)</span>是协方差矩阵<span class="math">\(\boldsymbol\Sigma\)</span>的特征值和特征向量。令<span class="math">\(y_i=\mathbf{u}_i^\text{T}(\mathbf{x}-\boldsymbol\mu)\)</span>，即<span class="math">\(\mathbf{y}=\mathbf{U}(\mathbf{x}-\boldsymbol\mu)\)</span>有马氏距离
+</p>
+<div class="math">$$\Delta^2=\sum_{i=1}^D\frac{y_i^2}{\lambda_i},$$</div>
+<p>
+其中协方差矩阵和均值（偏移）被抹去，等同于多个相互独立的高斯变量的乘积。而此变量替换的雅可比矩阵
+</p>
+<div class="math">$$J_{ij}=\frac{\partial x_i}{\partial y_j}=U_{ji},$$</div>
+<p>
+其中<span class="math">\(\mathbf{U}\)</span>的第<span class="math">\(i\)</span>行为<span class="math">\(\mathbf{u}_i^\text{T}\)</span>。因此雅可比乘子<span class="math">\(|\mathbf{J}|=1\)</span>。因此
+</p>
+<div class="math">\begin{split}
+\int \mathcal{N}(\mathbf{x}|\boldsymbol\mu, \boldsymbol\Sigma)\text{d}\mathbf{x}&amp;=\int P(\mathbf{y})|\mathbf{J}|\text{d}\mathbf{y}\\
+&amp;=\prod_{j=1}^D\int_{-\infty}^\infty \frac{1}{2\pi\lambda_j}^{1/2}\exp\bigg\{-\frac{y_j^2}{2\lambda_j}\bigg\}\text{d}y_j\\
+&amp;=1
+\end{split}</div>
+<h3>均值</h3>
+<p>同样令<span class="math">\(\mathbf{z}=\mathbf{x}-\boldsymbol\mu\)</span>，带入有
+</p>
+<div class="math">\begin{split}
+\mathbb{E}[\mathbf{x}]&amp;=\frac{1}{(2\pi)^{D/2}|\boldsymbol\Sigma|^{1/2}}\int\exp\bigg\{-\frac{1}{2}\mathbf{z}^\text{T}\boldsymbol\Sigma^{-1}\mathbf{z}\bigg\}(\mathbf{z}+\boldsymbol\mu)\text{d}\mathbf{z}\\
+&amp;=\boldsymbol\mu
+\end{split}</div>
+<p>
+其中利用了指数项为偶函数来消除对含<span class="math">\(\mathbf{z}\)</span>的积分。</p>
+<h3>协方差</h3>
+<div class="math">\begin{split}
+\text{cov}[\mathbf{x}]&amp;=\mathbb{E}[(\mathbf{x}-\mathbb{E}[\mathbf{x}])(\mathbf{x}-\mathbb{E}[\mathbf{x}])^\text{T}]\\
+&amp;=\mathbb{E}[\mathbf{x}\mathbf{x}^\text{T}]-\boldsymbol\mu\boldsymbol\mu^\text{T}\\
+&amp;=\frac{1}{(2\pi)^{D/2}|\boldsymbol\Sigma|^{1/2}}\int\exp\bigg\{-\frac{1}{2}\mathbf{z}^\text{T}\boldsymbol\Sigma^{-1}\mathbf{z}\bigg\}(\mathbf{z}+\boldsymbol\mu)(\mathbf{z}+\boldsymbol\mu)^\text{T}\text{d}\mathbf{z}-\boldsymbol\mu\boldsymbol\mu^\text{T}\\
+&amp;=\frac{1}{(2\pi)^{D/2}|\boldsymbol\Sigma|^{1/2}}\int\exp\bigg\{-\frac{1}{2}\mathbf{z}^\text{T}\boldsymbol\Sigma^{-1}\mathbf{z}\bigg\}\mathbf{z}\mathbf{z}^\text{T}\text{d}\mathbf{z}
+\end{split}</div>
+<p>
+令<span class="math">\(\mathbf{z}=\sum_{j=1}^Dy_j\mathbf{u}_j\)</span>以消除<span class="math">\(\boldsymbol\Sigma^{-1}\)</span>，整理并且再次利用指数的偶函数消去奇数次项得
+</p>
+<div class="math">\begin{split}
+\text{cov}[\mathbf{x}]&amp;=\frac{1}{(2\pi)^{D/2}|\boldsymbol\Sigma|^{1/2}}\sum_{i=1}^D\sum_{j=1}^D\mathbf{u}_i\mathbf{u}_j^\text{T}\int\exp\bigg\{-\sum_{k=1}^D\frac{y_k^2}{2\lambda_k}\bigg\}y_iy_j\text{d}\mathbf{y}\\
+&amp;=\frac{1}{(2\pi)^{D/2}|\boldsymbol\Sigma|^{1/2}}\sum_{i=1}^D\mathbf{u}_i\mathbf{u}_i^\text{T}\int\exp\bigg\{-\sum_{k=1}^D\frac{y_k^2}{2\lambda_k}\bigg\}y_i^2\text{d}\mathbf{y}\\
+&amp;=\sum_{i=1}^D\mathbf{u}_i\mathbf{u}_i^\text{T}\lambda_i\\
+&amp;=\boldsymbol\Sigma
+\end{split}</div>
 <h1>高斯分布的几个常用结果</h1>
+<h2>条件高斯分布</h2>
+<p>多维高斯变量中一部分变量依赖另一部分变量，服从条件高斯分布。对参数引入高斯分布时最常见。</p>
 <h1>非参数化建模方法估计概率密度</h1>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
