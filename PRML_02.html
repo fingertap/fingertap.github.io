@@ -8,7 +8,7 @@
         <meta name="keywords" content="Machine Learning, Notes">
         <link rel="icon" href="/favicon.ico">
 
-        <title>PRML Probability Distribution Note (To be cont.) - Fingertap</title>
+        <title>PRML Probability Distribution Note - Fingertap</title>
 
         <!-- Stylesheets -->
         <link href="/theme/css/all.min.css" rel="stylesheet">
@@ -52,7 +52,7 @@
         <div class="row">
               <div class="col-lg-12">
                   <div class="header-content">
-                      <h1 class="header-title">PRML Probability Distribution Note (To be cont.)</h1>
+                      <h1 class="header-title">PRML Probability Distribution Note</h1>
                       <p class="header-date">By <a href="/author/han.html">Han</a>, 二 04 十月 2016, modified 二 04 十月 2016, in category <a href="/category/prml-notes.html">Prml notes</a></p>
                       <div class="clearfix"></div>
                       <p class="pull-right header-tags">
@@ -369,9 +369,36 @@ $$</div>
 &amp;=\boldsymbol\Sigma
 \end{split}</div>
 <h1>高斯分布的几个常用结果</h1>
+<p>这里用到的技巧都是对指数项进行配方，PRML中讲得很详细。</p>
 <h2>条件高斯分布</h2>
-<p>多维高斯变量中一部分变量依赖另一部分变量，服从条件高斯分布。对参数引入高斯分布时最常见。</p>
-<h1>非参数化建模方法估计概率密度</h1>
+<p>之后的分部高斯分布表示为<span class="math">\(\mathcal{N}(\mathbf{x}_a, \mathbf{x}_b)\)</span>，其均值为<span class="math">\((\boldsymbol\mu_a, \boldsymbol\mu_b)^\text{T}\)</span>，协方差矩阵为<span class="math">\(
+    \left(<div class="math">\begin{array}{cc}   
+       \boldsymbol\Sigma_{aa} &amp;    \boldsymbol\Sigma_{ab}   \\   
+        \boldsymbol\Sigma_{ba} &amp;    \boldsymbol\Sigma_{bb} \\  
+\end{array}</div>\right)\)</span>。
+多维高斯变量中一部分变量依赖另一部分变量，服从条件高斯分布。分布<span class="math">\(\mathcal{N}(\mathbf{x}_a|\mathbf{x}_b)\)</span>的参数记作<span class="math">\(\boldsymbol\mu_{a|b}\)</span>以及<span class="math">\(\boldsymbol\Sigma_{a|b}\)</span>。
+</p>
+<div class="math">\begin{split}
+\boldsymbol\mu_{a|b}&amp;=\boldsymbol\mu_a+\boldsymbol\Sigma_{ab}\boldsymbol\Sigma_{bb}^{-1}(\mathbf{x}_b-\boldsymbol\mu_b)\\
+\boldsymbol\Sigma_{a|b}&amp;=\boldsymbol\Sigma_{aa}-\boldsymbol\Sigma_{aa}\boldsymbol\Sigma_{bb}^{-1}\boldsymbol\Sigma_{ba}
+\end{split}</div>
+<h2>边缘高斯分布</h2>
+<p>分部高斯中<span class="math">\(\mathbf{x}_a\)</span>对应的边缘概率服从高斯分布<span class="math">\(\mathcal{N}(\mathbf{x}_a|\boldsymbol\mu_a, \boldsymbol\Sigma_{aa})\)</span>。</p>
+<h2>高斯变量的贝叶斯定理结果</h2>
+<p>设两高斯分布
+</p>
+<div class="math">\begin{split}
+P(\mathbf{x})&amp;=\mathcal{N}(\mathbf{x}|\boldsymbol\mu, \boldsymbol
+\Lambda^{-1})\\
+P(\mathbf{y}|\mathbf{x})&amp;=\mathcal{N}(\mathbf{y}|\mathbf{Ax}+\mathbf{b}, \mathbf{L}^{-1})
+\end{split}</div>
+<p>
+由上面的分部高斯结果（条件高斯和边缘高斯）可以使用贝叶斯公式得到后验概率和另一部分的边缘分布
+</p>
+<div class="math">\begin{split}
+P(\mathbf{y})&amp;=\mathcal{N}(\mathbf{y}|\mathbf{A}\boldsymbol{\mu}+\mathbf{b}, \mathbf{L}^{-1}+\mathbf{A}\boldsymbol\Lambda^{-1}\mathbf{A}^\text{T})\\
+P(\mathbf{x}|\mathbf{y})&amp;=\mathcal{N}(\mathbf{x}|\boldsymbol\Sigma\{\mathbf{A}^\text{T}\mathbf{L}(\mathbf{y}-\mathbf{b}+\boldsymbol{\Lambda\mu})\}, \boldsymbol\Sigma)
+\end{split}</div>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
