@@ -76,8 +76,8 @@ enabled = true
 
 ## Comments
 [comments]
-enabled = false
-provider = "gittalk"
+enabled = true
+provider = "gitalk"
 
 [comments.disqusjs]
 shortname = ""
@@ -139,11 +139,11 @@ reactionsEnabled = 1
 emitMetadata = 0
 
 [comments.gitalk]
-owner = ""
-admin = ""
-repo = ""
-clientID = ""
-clientSecret = ""
+owner = "fingertap"
+admin = "fingertap"
+repo = "https://github.com/fingertap/blog_comments"
+clientID = "Ov23liDxU1MoajbLqlcG"
+clientSecret = "24eaa552a1897d0623e44ec56deac4cf03711322"
 
 [comments.cusdis]
 host = ""
