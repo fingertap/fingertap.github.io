@@ -6,7 +6,7 @@ tags:
     - Machine Learning
     - Bayesian
     - Math
-category:
+categories:
     - Machine Learning
 image: cover.png
 math : true
