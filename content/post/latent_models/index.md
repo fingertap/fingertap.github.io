@@ -44,7 +44,7 @@ $$
 \max_\theta\hat{\mathcal{L}}(q, \theta;\mathbf{X})=\sum_{x\in\mathcal{X}}\sum_{z\in\mathcal{Z}}q(z)\left\{\log p_\theta(x, z)-\log q(z)\right\}.
 $$
 
-这个下界是一个双变量的泛函，一个变量是概率密度$q$，一个变量是参数$\theta$。采用坐标梯度法，交替寻找当前最优的$q$和$\theta$即为EM算法。对$q$取最大要求$(2)$式中等号成立，即要求$\forall z \in \mathcal{Z}, p_\theta(x, z)/q(z)=C$，$C$为某一常数，简单计算一下能得到$C = p_\theta(x|z)$，而
+这个下界是一个双变量的泛函，一个变量是概率密度$q$，一个变量是参数$\theta$。采用坐标梯度法，交替寻找当前最优的$q$和$\theta$即为EM算法。对$q$取最大要求$(2)$式中等号成立，即要求$\forall z \in \mathcal{Z}, p_\theta(x, z)/q(z)=C$，$C$为某一常数，简单计算一下能得到$C = p_\theta(x)$，而
 
 $$
 \tag{E step}
