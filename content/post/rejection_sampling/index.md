@@ -116,15 +116,11 @@ $$
 因此有
 
 $$
-\begin{align}
-P(X_{t+1}=x') &= \sum_{x_t}\pi(x_t)\cdot q(x'|x_t) \cdot \alpha(x'|x_t)
-    + \pi(x')\cdot \left(\sum_{x_t}q(x_t|x')\cdot [1 - \alpha(x_t|x')]\right) \notag \\
-&= \sum_{x_t}\pi(x')q(x_t|x')\alpha(x_t|x')
-    + \pi(x')\sum_{x_t}q(x_t|x')
-    - \pi(x')\sum_{x_t}q(x_t|x')\alpha(x_t|x') \notag \\
-&= \pi(x') \notag
-
-\end{align}
+\begin{aligned}
+P(X_{t+1}=x') &= \sum_{x_t}\pi(x_t)\cdot q(x'|x_t) \cdot \alpha(x'|x_t) + \pi(x')\cdot \left(\sum_{x_t}q(x_t|x')\cdot [1 - \alpha(x_t|x')]\right) \\
+&= \sum_{x_t}\pi(x')q(x_t|x')\alpha(x_t|x') + \pi(x')\sum_{x_t}q(x_t|x') - \pi(x')\sum_{x_t}q(x_t|x')\alpha(x_t|x') \\
+&= \pi(x')
+\end{aligned}
 $$
 
 </details>
