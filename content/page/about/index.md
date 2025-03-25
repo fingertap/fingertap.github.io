@@ -1,5 +1,5 @@
 ---
-title: 关于我
+title: About Me
 links:
   - title: 我的Github
     description: Fingertap's github page.
