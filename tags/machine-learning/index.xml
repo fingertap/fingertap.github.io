@@ -1,0 +1,579 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Machine Learning on 张晗的随笔</title><link>https://fingertap.github.io/tags/machine-learning/</link><description>Recent content in Machine Learning on 张晗的随笔</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 18 Mar 2025 22:17:03 +0800</lastBuildDate><atom:link href="https://fingertap.github.io/tags/machine-learning/index.xml" rel="self" type="application/rss+xml"/><item><title>从拒绝采样到投机推理</title><link>https://fingertap.github.io/p/%E4%BB%8E%E6%8B%92%E7%BB%9D%E9%87%87%E6%A0%B7%E5%88%B0%E6%8A%95%E6%9C%BA%E6%8E%A8%E7%90%86/</link><pubDate>Tue, 18 Mar 2025 22:17:03 +0800</pubDate><guid>https://fingertap.github.io/p/%E4%BB%8E%E6%8B%92%E7%BB%9D%E9%87%87%E6%A0%B7%E5%88%B0%E6%8A%95%E6%9C%BA%E6%8E%A8%E7%90%86/</guid><description>&lt;img src="https://fingertap.github.io/p/%E4%BB%8E%E6%8B%92%E7%BB%9D%E9%87%87%E6%A0%B7%E5%88%B0%E6%8A%95%E6%9C%BA%E6%8E%A8%E7%90%86/cover.png" alt="Featured image of post 从拒绝采样到投机推理" />&lt;p>这两天看到ICLR 2025的一篇Oral做投机采样和级联模型结合，突然感觉以前拒绝采样的知识都很模糊了，于是有了这篇梳理拒绝采样的文章。&lt;/p>
+&lt;h2 id="采样问题">采样问题
+&lt;/h2>&lt;p>经典的采样问题是说，我希望从某个空间中采样出一些$x$，其采样出来的概率服从一个分布$\pi(x)$。&lt;/p>
+&lt;p>举例来说，如果这个空间是像素空间，分布$\pi(x)$的概率密度聚集于猫狗照片，那么我们期望从中采样出来的$x$都是一些小猫小狗的照片；如果这个空间是句子空间，分布$\pi(x)$的概率密度聚集于一些中文语料，那么我们期望从中采样出来的$x$都是一些中文的句子。&lt;/p>
+&lt;p>对于一个简单的分布，我们可以用&lt;a class="link" href="https://online.stat.psu.edu/stat414/lesson/22/22.2" target="_blank" rel="noopener"
+>change of variable规则&lt;/a>，将均匀分布转换成目标分布。然而，这种方法对于无法积分或者甚至没有解析表达的分布而言是不可行的。对于这样的分布，我们假设我们对于任意$x$，可以计算其概率密度$\pi(x)$，希望能采样出一系列样本$\left\lbrace x_i\right\rbrace_{i=1}^N$，使得每个样本被采样到的概率$P\left(X=x_i\right)$等于其真实概率$\pi\left(x_i\right)$。&lt;/p>
+&lt;h2 id="朴素的拒绝采样">朴素的拒绝采样
+&lt;/h2>&lt;p>朴素的拒绝采样的做法是给定一个提议分布 $q(x)$ ，将其乘上一个常数$k$以保证在任意 $x$ 处 $kq(x)\geq\pi(x)$ 。有了这个条件以后，我们按照这样的拒绝采样流程得到样本：&lt;/p>
+&lt;ol>
+&lt;li>从提议分布 $q(x)$ 中采样得到样本$x$，&lt;/li>
+&lt;li>以概率 $\frac{\pi(x)}{k \cdot q(x)}$ 接受这个样本。&lt;/li>
+&lt;/ol>
+&lt;p>显然对于所有被接受的样本，其被采样的概率是正比与$\pi(x)$的。然而，如下图所示，所有红色部分都会被拒绝，因此朴素的拒绝采样的样本效率可能会较低，一个更紧的提议分布上界带来的拒绝率越低。&lt;/p>
+&lt;p>&lt;img src="https://fingertap.github.io/p/%E4%BB%8E%E6%8B%92%E7%BB%9D%E9%87%87%E6%A0%B7%E5%88%B0%E6%8A%95%E6%9C%BA%E6%8E%A8%E7%90%86/naive_rej.png"
+width="1000"
+height="500"
+srcset="https://fingertap.github.io/p/%E4%BB%8E%E6%8B%92%E7%BB%9D%E9%87%87%E6%A0%B7%E5%88%B0%E6%8A%95%E6%9C%BA%E6%8E%A8%E7%90%86/naive_rej_hu_fba22502dd4ee8db.png 480w, https://fingertap.github.io/p/%E4%BB%8E%E6%8B%92%E7%BB%9D%E9%87%87%E6%A0%B7%E5%88%B0%E6%8A%95%E6%9C%BA%E6%8E%A8%E7%90%86/naive_rej_hu_95f05df02036855b.png 1024w"
+loading="lazy"
+alt="Naive Rejection Sampling"
+class="gallery-image"
+data-flex-grow="200"
+data-flex-basis="480px"
+>&lt;/p>
+&lt;h2 id="适应性拒绝采样">适应性拒绝采样
+&lt;/h2>&lt;p>朴素的拒绝采样有可能连续出现样本被拒绝的情况。这在目标分布非常尖锐，提议分布无法很紧地包住它时常见（例如上图中2峰变为N峰，提议分布仍然使用高斯时）。适应性的拒绝采样可以有效提高采样效率，降低拒绝率。&lt;/p>
+&lt;p>适应性采样保证了不会出现连续被拒绝的样本。其核心思想是将采样的概率质量区域划分为三部分：&lt;/p>
+&lt;ol>
+&lt;li>拒绝区域 $q(x)&amp;gt;\pi(x)$ ，即下图的红色区域。&lt;/li>
+&lt;li>接受区域 $\min(q(x), \pi(x))$ ，即下图的绿色区域。&lt;/li>
+&lt;li>重采样区域 $\max(\pi(x) - q(x), 0)$ ，即下图的蓝色区域。&lt;/li>
+&lt;/ol>
+&lt;p>&lt;img src="https://fingertap.github.io/p/%E4%BB%8E%E6%8B%92%E7%BB%9D%E9%87%87%E6%A0%B7%E5%88%B0%E6%8A%95%E6%9C%BA%E6%8E%A8%E7%90%86/adaptive_rej.png"
+width="1000"
+height="600"
+srcset="https://fingertap.github.io/p/%E4%BB%8E%E6%8B%92%E7%BB%9D%E9%87%87%E6%A0%B7%E5%88%B0%E6%8A%95%E6%9C%BA%E6%8E%A8%E7%90%86/adaptive_rej_hu_1d36b855f7ff9475.png 480w, https://fingertap.github.io/p/%E4%BB%8E%E6%8B%92%E7%BB%9D%E9%87%87%E6%A0%B7%E5%88%B0%E6%8A%95%E6%9C%BA%E6%8E%A8%E7%90%86/adaptive_rej_hu_46163e22aef1a2fa.png 1024w"
+loading="lazy"
+alt="Adaptive Rejection Sampling"
+class="gallery-image"
+data-flex-grow="166"
+data-flex-basis="400px"
+>&lt;/p>
+&lt;p>其中，对于属于重采样区域的样本$x$，其概率密度正比于 $\max(\pi(x) - q(x), 0)$ 。具体采样流程如下：&lt;/p>
+&lt;ol>
+&lt;li>从提议分布 $q(x)$ 中采样得到样本$x$，&lt;/li>
+&lt;li>以概率 $\min\left(\frac{\pi(x)}{q(x)}, 1\right)$ 接受这个样本（即落在绿色区域即接受）。&lt;/li>
+&lt;li>若拒绝了此样本$x$，从蓝色区域采样一个样本出来。&lt;/li>
+&lt;/ol>
+&lt;p>适应性拒绝采样可以保证两次采样必然能获得至少一个接受样本 。然而，重采样过程和从原分布采样是类似的，在无法积分的情况下不可行，但是在大语言模型的生成分布是多项分布，因此投机推理中适应性采样恰好合用。&lt;/p>
+&lt;details>
+&lt;summary>细节推导&lt;/summary>
+&lt;p>分情况讨论。&lt;/p>
+&lt;p>记第一次采样的样本为 $x$ ，若 $q(x) &amp;gt; \pi(x)$ ，且最终 $x$ 被接受，这时和经典拒绝采样等价。&lt;/p>
+&lt;p>若 $q(x) &amp;gt; \pi(x)$ 且最终 $x$ 被拒绝，这时会在 $S=\lbrace x | \pi(x) &amp;gt; q(x)\rbrace$区域采样，记此时采样的样本为 $x&amp;rsquo;$ 。则样本被采样到的概率质量 $P(X=x&amp;rsquo;) = \frac{\pi(x) - q(x)}{Resample Area}$ , 最关键的部分是需要知道上图中蓝色部分和红色部分的概率面积是相等的，都等于 $1-\text{Acceptance Area}$ 。因此重采样到 $x&amp;rsquo;$ 的概率是 $\pi(x&amp;rsquo;) - q(x&amp;rsquo;)$。再加上一开始如果采样到 $S$ 时直接接受，概率为 $q(x&amp;rsquo;)$，因此在 $S$ 区域的采样概率也为 $\pi(x)$ 。&lt;/p>
+&lt;/details>
+&lt;h2 id="在线采样">在线采样
+&lt;/h2>&lt;p>在线采样是一种在数据流或实时数据环境中进行数据采样的方法。与传统的离线采样不同，在线采样需要在数据到达时即时进行决策，以确定是否将该数据点包含在样本中。这里我们主要考虑蓄水池采样（reservoir sampling），即数据点源源不断，可能永远不会停止的情形。在任意时刻，要求采样出来的 $K$ 个样本都是无偏的，采样概率由分布 $\pi(x)$ 决定。&lt;/p>
+&lt;p>假设我们要采样 $K$ 个样本，记采样的样本构成的集合为 $S_t$ ，样本为 $x_t$，维护一个历史的所有样本的权重和 $W_t$。在线采样通过以下的流程保证采样过程服从 $\pi(x)$ ：&lt;/p>
+&lt;ol>
+&lt;li>若 $|S_t| &amp;lt; K$ ，$S_t = S_{t-1} \cup \lbrace x_t \rbrace$&lt;/li>
+&lt;li>若 $|S_t| \geq K$ , 累加权重 $W_t=W_{t-1}+\pi(x_t)$&lt;/li>
+&lt;li>以 $\frac{\pi(x)}{W_t}$ 的概率接受该样本并随机替换掉一个已采样的样本&lt;/li>
+&lt;/ol>
+&lt;details>
+&lt;summary>简单证明&lt;/summary>
+&lt;p>假设在 $t-1$ 时刻是无偏采样，对任意一个样本 $x_i$ ，其采样的概率都是 $\frac{\pi(x_i)}{W_{t-1}}$ ，那么在 $t$ 时刻，旧元素的保留概率为&lt;/p>
+$$
+P(x_i \in S_t) = P(x_i \in S_{t-1}) \cdot \left[ 1 - \frac{\pi(x_i)}{W_t}\cdot \frac{1}{K} \cdot K \right] = \frac{\pi(x_i)}{W_{t-1}} \cdot \frac{W_t - \pi(x_i)}{W_t} = \frac{\pi(x_i)}{W_t}
+$$&lt;p>等于新元素被保留的概率，因此 $t$ 时刻也是无偏的采样。&lt;/p>
+&lt;/details>
+&lt;h2 id="metroplis采样">Metroplis采样
+&lt;/h2>&lt;p>Metroplis采样是著名的MCMC采样中使用的方法。其核心思想是用局部的提议分布代替全局的提议分布，从而避免全局提议分布带来的低采样率。其成立的条件是ergodicity和detailed balance。前者不用多说，后者其实本质是一个充分条件，描述的是稳态时任意一个采样值 $x$ 的流出概率密度（从 $x$ 转移到其他状态的概率）等于其流入的概率密度。&lt;/p>
+&lt;p>Metropolis采样的具体流程如下：&lt;/p>
+&lt;ol>
+&lt;li>给定当前状态 $x_t$，从提议分布 $q(x|x_t)$ 中采样得到候选状态 $x'$&lt;/li>
+&lt;li>以概率 $\min\left(1, \frac{\pi(x&amp;rsquo;)q(x_t|x&amp;rsquo;)}{\pi(x_t)q(x&amp;rsquo;|x_t)}\right)$ 接受候选状态，即 $x_{t+1} = x&amp;rsquo;$，否则保持当前状态 $x_{t+1} = x_t$&lt;/li>
+&lt;/ol>
+&lt;p>其中，$\pi(x)$ 是目标分布，$q(x|x_t)$ 是提议分布。如果提议分布是对称的，即 $q(x|x_t) = q(x_t|x)$，那么接受概率可以简化为 $\min\left(1, \frac{\pi(x&amp;rsquo;)}{\pi(x_t)}\right)$。&lt;/p>
+&lt;details>
+&lt;summary>Detailed Balance&lt;/summary>
+&lt;p>Metroplis采样基于局部的稳态（detailed balance），要求从任意一个状态流出的概率质量等于流入该状态的概率质量。记当前状态为 $x_t$ ，转移到 $x&amp;rsquo;$ 的接收概率为 $\alpha(x&amp;rsquo;|x_t) = \min\left(1, \frac{\pi(x&amp;rsquo;)q(x_t|x&amp;rsquo;)}{\pi(x_t)q(x&amp;rsquo;|x_t)}\right)$ ，那么总有&lt;/p>
+$$
+\pi(x_t)q(x'|x_t)\alpha(x'|x_t) = \pi(x')q(x_t|x')\alpha(x_t|x')
+$$&lt;p>原因是 $\alpha(x&amp;rsquo;|x_t)$ 和 $\alpha(x_t|x&amp;rsquo;)$ 总是一个为1，另一个不为1。在这种情况下，假设在 $t$ 时刻已经达到了目标分布，即 $P(X_t=x)\pi(x)$ ，那么在 $t+1$ 时刻我们希望仍然保证是目标分布。&lt;/p>
+&lt;p>由于对于任意状态$x&amp;rsquo;$，其概率质量来自两部分：&lt;/p>
+&lt;ul>
+&lt;li>从其他状态$x_t$转移过来的概率&lt;/li>
+&lt;li>保持在原状态的概率&lt;/li>
+&lt;/ul>
+&lt;p>因此有&lt;/p>
+$$
+\begin{aligned}
+P(X_{t+1}=x') &amp;= \sum_{x_t}\pi(x_t)\cdot q(x'|x_t) \cdot \alpha(x'|x_t) + \pi(x')\cdot \left(\sum_{x_t}q(x_t|x')\cdot [1 - \alpha(x_t|x')]\right) \\
+&amp;= \sum_{x_t}\pi(x')q(x_t|x')\alpha(x_t|x') + \pi(x')\sum_{x_t}q(x_t|x') - \pi(x')\sum_{x_t}q(x_t|x')\alpha(x_t|x') \\
+&amp;= \pi(x')
+\end{aligned}
+$$&lt;/details>
+&lt;h2 id="投机推理">投机推理
+&lt;/h2>&lt;p>投机推理 （speculative inference）和Metroplis采样几乎相同，其中提议分布为一个小的语言模型。对于第一个被拒绝的样本，投机采样使用适应性拒绝采样，原因是两个语言模型的输出分布都是已知的Categorical分布。只需要找出所有大模型比小模型高的logits，非负截断并做归一化以后直接采样即可。&lt;/p></description></item><item><title>一种新的KL散度估计</title><link>https://fingertap.github.io/p/%E4%B8%80%E7%A7%8D%E6%96%B0%E7%9A%84kl%E6%95%A3%E5%BA%A6%E4%BC%B0%E8%AE%A1/</link><pubDate>Fri, 07 Mar 2025 22:55:45 +0800</pubDate><guid>https://fingertap.github.io/p/%E4%B8%80%E7%A7%8D%E6%96%B0%E7%9A%84kl%E6%95%A3%E5%BA%A6%E4%BC%B0%E8%AE%A1/</guid><description>&lt;img src="https://fingertap.github.io/p/%E4%B8%80%E7%A7%8D%E6%96%B0%E7%9A%84kl%E6%95%A3%E5%BA%A6%E4%BC%B0%E8%AE%A1/cover.png" alt="Featured image of post 一种新的KL散度估计" />&lt;p>最近一直在研究LLM中的强化学习，其中KL散度作为一个关键的方法，通常用于作为正则，要求优化分布距离参考分布不能太远。&lt;a class="link" href="http://joschu.net/blog/kl-approx.html" target="_blank" rel="noopener"
+>John Schulman的博客&lt;/a>里讨论K2和K3，作为两种能保证KL估计在所有采样点处均非负的估计子。&lt;/p>
+&lt;p>然而这两个估计子都不够鲁棒，K2自不用说，方差特别大。广泛被大家采用的K3其实也有很大的问题，原因是估计中存在$\frac{p(x)}{q(x)}$项，当$q(x)$很小时这个值会非常大。这导致我们的优化过程中会不时出现很大的spike，容易带崩训练。&lt;/p>
+&lt;p>因此我们需要构造一个不会引起spike的KL估计子，这个估计子中不能包含$p(x)/q(x)$项。同时，我们也需要这个KL估计子是非负的，否则模型将可以很容易地hack这个KL。&lt;/p>
+&lt;p>直接上结论，我提出一个K4估计子&lt;/p>
+$$
+K4(x; p, q)=\log \left(p^2(x) - 2p(x)q(x) + 2q^2(x)\right) - 2\log q(x) \tag{1}
+$$&lt;p>这个算子的性能全方位优于已有算子，表现为具有更低的偏差，更低的方差，保证非负，保证没有spike。我用John的代码测试了K4：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">torch.distributions&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">dis&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">pandas&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">pd&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">p&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">dis&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Normal&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">loc&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mf">0.5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">scale&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mf">1.2&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">q&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">dis&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Normal&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">loc&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mf">1.3&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">scale&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mf">2.5&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">x&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">q&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sample&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sample_shape&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">10_000_000&lt;/span>&lt;span class="p">,))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">truekl&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">dis&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">kl_divergence&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">p&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">q&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;true&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">truekl&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">logr&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">p&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">log_prob&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">q&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">log_prob&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">k1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">logr&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">k2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">logr&lt;/span> &lt;span class="o">**&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">k3&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">logr&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exp&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">logr&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">px&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">p&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">log_prob&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exp&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">qx&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">q&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">log_prob&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exp&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">k4&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">px&lt;/span>&lt;span class="o">**&lt;/span>&lt;span class="mi">2&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="n">px&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="n">qx&lt;/span>&lt;span class="o">+&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="n">qx&lt;/span>&lt;span class="o">**&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">log&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">q&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">log_prob&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">results&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">kl_names&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;k1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;k2&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;k3&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;k4&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">kl_estimators&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">k1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">k2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">k3&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">k4&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="n">k&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">kl_name&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="nb">zip&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">kl_estimators&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">kl_names&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">bias&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">k&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">mean&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">truekl&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="n">truekl&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">std&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">k&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">std&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="n">truekl&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">min&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">k&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">min&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">max&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">k&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">max&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">results&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">kl_name&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;bias&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">bias&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">item&lt;/span>&lt;span class="p">(),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;std&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">std&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">item&lt;/span>&lt;span class="p">(),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;min&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">min&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">item&lt;/span>&lt;span class="p">(),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;max&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">max&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">item&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">pd&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">DataFrame&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">results&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">T&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>结果：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>&lt;/th>
+&lt;th>bias&lt;/th>
+&lt;th>std&lt;/th>
+&lt;th>min&lt;/th>
+&lt;th>max&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>k1&lt;/strong>&lt;/td>
+&lt;td>1.893368&lt;/td>
+&lt;td>6.842822&lt;/td>
+&lt;td>-8.004973e-01&lt;/td>
+&lt;td>49.598541&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>k2&lt;/strong>&lt;/td>
+&lt;td>10.049346&lt;/td>
+&lt;td>40.413708&lt;/td>
+&lt;td>2.842171e-14&lt;/td>
+&lt;td>1230.007690&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>k3&lt;/strong>&lt;/td>
+&lt;td>1.892912&lt;/td>
+&lt;td>5.611935&lt;/td>
+&lt;td>0.000000e+00&lt;/td>
+&lt;td>48.598541&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>k4&lt;/strong>&lt;/td>
+&lt;td>0.164644&lt;/td>
+&lt;td>0.717409&lt;/td>
+&lt;td>-2.384186e-07&lt;/td>
+&lt;td>0.918155&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;details>
+&lt;p>K4在式$(1)$中的形式等价于&lt;/p>
+$$
+\log\left\{\left(\frac{p(x)}{q(x)}-1\right)^2+1\right\}
+$$&lt;p>这显然是大于0且在$\frac{p(x)}{q(x)}=1$处取得最小值0。&lt;/p>
+&lt;/details>
+&lt;h3 id="citation">Citation
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">@misc{ZhangBlogKL,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> author = {Zhang, Han},
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> title = {Yet another new {KL} estimator},
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> year = {2025},
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> howpublished = {Blog post},
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> url = {https://fingertap.github.io/p/一种新的KL散度估计},
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> urldate = {2025-03-07}
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>梯度下降收敛分析</title><link>https://fingertap.github.io/p/%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E6%94%B6%E6%95%9B%E5%88%86%E6%9E%90/</link><pubDate>Sun, 28 Jul 2019 23:34:55 +0800</pubDate><guid>https://fingertap.github.io/p/%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E6%94%B6%E6%95%9B%E5%88%86%E6%9E%90/</guid><description>&lt;img src="https://fingertap.github.io/p/%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E6%94%B6%E6%95%9B%E5%88%86%E6%9E%90/cover.png" alt="Featured image of post 梯度下降收敛分析" />&lt;p>这篇里记录一下梯度下降在一般条件下的收敛分析。关键的思想有&lt;/p>
+&lt;ol>
+&lt;li>利用泰勒公式+拉格朗日余项对函数做二阶展开。&lt;/li>
+&lt;li>Smooth和Convexity分别对梯度、海塞引入上下界。&lt;/li>
+&lt;li>收敛$\Leftrightarrow f$是Lipschitz smooth（stochastic情形下也需要假设次梯度方差有界，这等于是说smooth，甚至比smooth更强因为smoothness等价于梯度平方有上界）。&lt;/li>
+&lt;li>收敛速度取决于$|\nabla f(x)|$的下界，即有多convex。&lt;/li>
+&lt;/ol>
+&lt;p>注：用$|x-x^\star|^2$和$f(x)-f(x^\star)$来推导结果是一致的，前者用完全平方公式展开，后者用泰勒展开。&lt;/p>
+&lt;hr>
+&lt;h2 id="表格结果">表格结果
+&lt;/h2>&lt;p>假设Lipschitz平滑常数为$M$，强凸常数为$m$，初始距离最优值距离$|x_0-x^\star|\leq r$，初始函数值差距$f(x_0)-f(x^\star)\leq R$，随机情形下假设$\mathbb{E}[|\tilde g_{\theta}|\theta|^2]\leq B^2$，有以下结果：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: center">Methods&lt;/th>
+&lt;th style="text-align: center">Non-smooth&lt;/th>
+&lt;th style="text-align: center">Smooth+Non-convex&lt;/th>
+&lt;th style="text-align: center">Smooth+Convex&lt;/th>
+&lt;th style="text-align: center">Smooth+Strong Convexity&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: center">Gradient Descent&lt;/td>
+&lt;td style="text-align: center">May Divergent&lt;/td>
+&lt;td style="text-align: center">Converge to local optima&lt;/td>
+&lt;td style="text-align: center">$O(\frac{Mr^2}{K})$&lt;/td>
+&lt;td style="text-align: center">$O\left(\left(1-\frac{m}{M}\right)^KR\right)$&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: center">Stochastic Gradient Descent&lt;/td>
+&lt;td style="text-align: center">May Divergent&lt;/td>
+&lt;td style="text-align: center">Almost surely converge to Critical points&lt;/td>
+&lt;td style="text-align: center">$O(\frac{Br}{\sqrt{K}})$&lt;/td>
+&lt;td style="text-align: center">$O(\frac{B^2}{mK})$&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>对于一般非凸非光滑问题的收敛速度的界我们没有好的结果，因为这至少是NP难问题。&lt;/p>
+&lt;hr>
+&lt;h2 id="基础">基础
+&lt;/h2>&lt;p>考虑可导函数$f:\mathbb{R}^d\rightarrow\mathbb{R}$，在任一点处展开有：&lt;/p>
+$$
+f(x) = f(y) + (x-y)^T\nabla f(y) + (x-y)^T\nabla^2f(c)(x-y),
+\tag{1}
+$$&lt;p>其中$c$是$x$和$y$线段上一点。&lt;/p>
+&lt;h3 id="convexitystrong-convexitylipschitz-smooth">Convexity、Strong Convexity、Lipschitz Smooth
+&lt;/h3>&lt;p>我们说他是&lt;strong>凸函数&lt;/strong>，意味着$\forall c\in\mathbf{dom}f, \nabla^2f(c)\succeq0$，即$\forall x, y\in \mathbf{dom}f$&lt;/p>
+$$
+f(x) \geq f(y) + (x-y)^T\nabla f(y).
+$$&lt;p>Lipschitz smooth和Strong convexity类似，是对$\nabla^2f(c)$引入了上下界。假设$f(x)$是$M$-Lipschitz smooth，以及$m$-strongly convex，有$\forall c\in\mathbf{dom}f$&lt;/p>
+$$
+mI\preceq \nabla^2f(c)\preceq MI,
+$$&lt;p>其中$I$是单位矩阵。注意这样一来Convex可以看做是0-strongly convex。Lipschitz smooth直觉理解就是没有折点（例如$|x|$在$x=0$处），Strong convexity直觉理解就是没有盆地（一片区域的函数值相等）。如果我们考虑最优值$x^\star$，对于强凸和smooth我们分别有&lt;/p>
+$$
+2m\left\{f(x)-f(y)\right\}\leq\left\|\nabla f(x)\right\|^2\leq 2m\left\{f(x)-f(y)\right\}
+$$&lt;p>（代入式(1)，右边对$y$求极值）&lt;/p>
+&lt;h3 id="machine-learning-lossgradient-descentstochastic-gradient-descent">Machine Learning Loss、Gradient Descent、Stochastic Gradient Descent
+&lt;/h3>&lt;p>对于一族有监督统计学习模型$M_\theta$（模型的参数为$\theta\in\Theta$），设输入样本-标签对$(x, y)\in\mathcal{D}$满足$x\in\mathcal{X}, y\in\mathcal{Y}$，模型的决策函数（泛函）为$f_\theta:\mathcal{X}\rightarrow\mathcal{Y}$为连续映射。给定连续的损失函数$l:\mathcal{Y}\times\mathcal{Y}\rightarrow\mathbb{R}$，以及定义在$\mathcal{D}$上的概率度量$P$（密度函数为p），一个模型的好坏由期望损失给出：&lt;/p>
+$$
+L(M_\theta)\triangleq \mathbb{E}_{(x, y)\in\mathcal{D}}[l(f_\theta(x), y)]
+$$&lt;p>如果我们拿不到输入空间$\mathcal{D}$（需要掌握所有可能的数据生成的方式，但是我们如果有这个生成方式还训练什么模型呢？直接查表不好吗？）和概率度量$P$，则这个期望只能由我们已有的数据集$D\subset\mathcal{D}$来近似，此时在$D$上的损失叫做经验损失：&lt;/p>
+$$
+\hat{L}(M_\theta)\triangleq \frac{1}{|D|}\sum_{(x, y)\in D}l(f_\theta(x), y),
+$$&lt;p>这里假设了每个样本都是服从$P$，从$\mathcal{D}$中独立抽样出来的。则梯度下降\(GD\)的更新策略：&lt;/p>
+$$
+\begin{align}
+\theta_{k+1} &amp;= \theta_k - \alpha \nabla l (\theta_k)\\
+&amp;=\theta_k - \alpha\cdot\frac{1}{D}\sum_{(x, y)\in D}\frac{\partial l(f_{\theta_k}(x), y)}{\partial \theta_k}.
+\end{align}
+$$&lt;p>当$|D|$很大时计算$\nabla l(\theta_k)$的开支较大，随机梯度下降（SGD）对$D$进行采样，然后用带有随机性的梯度代替梯度下降中的$\nabla l(\theta_k)$。记采样得到的mini-batch为$D_k\subset D$，随机梯度定义为&lt;/p>
+$$
+\nabla l_{D_k}(\theta_k) = \frac{1}{|D_k|}\sum_{(x, y)\in D_k}\frac{\partial l(f_{\theta_k}(x), y)}{\partial \theta_k}.
+$$&lt;p>由于任意一个样本$(x, y)$的损失的期望都是$L(M_\theta)$，可以很简单地证明随机梯度和经验梯度的期望都是期望损失在$\theta$处的梯度。&lt;/p>
+&lt;p>有时候随机梯度下降的随机性并不只是来自于对数据的采样（比如为了使目标变平滑，对数据加入随机白噪声），此时有可能使得随机梯度并不落在可行区域内（比如$\theta_k=[0.1, 0.9]$，而梯度为$-0.2, 1.1$，而我们希望$|\theta|&lt;em>\infty\leq 1$），这时需要做一步正交投影操作，将更新后的$\theta&lt;/em>{k+1}$投影到可行区域$\Theta$内，方式是用最小二乘法在$\Theta$找一个距离$\theta_{k+1}$最近的点$\tilde\theta_{k+1}$，它满足$\forall \theta\in \Theta, |\theta-\theta_{k+1}|\geq|\theta-\tilde\theta_{k+1}|$，即投影后距离会缩小。&lt;/p>
+&lt;h3 id="relationship-between-gradient-and-stochastic-gradientsubgradient">Relationship between Gradient and Stochastic Gradient、Subgradient
+&lt;/h3>&lt;p>$f$在$x$处的次梯度（Subgradient）$g_x\in\mathbb{R}^d$是所有满足一阶条件的向量：$\forall x, y\in \mathbb{R}^d,$&lt;/p>
+$$
+f(y)\geq f(x) + g_x^T(y-x),
+$$&lt;p>所有次梯度的集合叫做Subdifferential，记作$\partial f(x)$。当$f$在$x$处可导时，$\partial f(x) = {\nabla f(x)}$。也即，如果函数是光滑的，就不用考虑次梯度，对于非光滑的问题一般会用次梯度下降来分析收敛性等。&lt;/p>
+&lt;p>我们称一个向量$\tilde g_x$为$f$在$x$处的带噪无偏次梯度（Noisy Unbiased Subgradient）若$\mathbb{E}[\tilde g_x]=g_x\in\partial f(x)$。&lt;strong>则随机梯度下降可以看做在梯度&lt;/strong>$\nabla l(\theta_k)$&lt;strong>中引入一个零均值的加性噪声，而这个噪声为此次mini-batch的泛函，记作&lt;/strong>$v(D_k)$。&lt;/p>
+&lt;hr>
+&lt;h2 id="收敛性分析">收敛性分析
+&lt;/h2>&lt;h3 id="gradient-descent">Gradient Descent
+&lt;/h3>&lt;p>&lt;strong>结论&lt;/strong>：&lt;em>梯度下降在无Smooth假设时可能不收敛，有M-smooth假设时收敛。达到精度&lt;/em>$\epsilon&amp;gt;0$&lt;em>，凸时收敛速度为&lt;/em>$o(\frac{MR^2}{\epsilon})$&lt;em>，强凸时收敛速度为&lt;/em>$o(\log_{1-m/M}\frac{\epsilon}{f(x_0)-f(x^\star)})$。&lt;/p>
+&lt;p>对$l(\theta)$没有任何假设的情况下，设$\theta^\star$使$l(\theta)$取得最小值，有：&lt;/p>
+$$
+l(\theta_{k+1})-l(\theta^\star)
+=\left\{l(\theta_k)-\alpha\nabla l(\theta_k)^T\nabla l(\theta_k)+\frac{\alpha^2}{2}\nabla l(\theta_k)^T\nabla^2 l(c)\nabla l(\theta_k)\right\}-l(\theta^\star),
+$$&lt;p>这里$c$是$\theta_k$和$\theta_{k+1}$线段上一点。如果$\nabla^2l(c)\rightarrow\infty$，则$\forall \alpha &amp;gt; 0, l(\theta_{k+1})-l(\theta^\star) &amp;gt;l(\theta_k)-l(\theta^\star)$，因此第$k$步迭代并没有降低损失。我们可以构造一个函数，使得从某个起点$\theta_0$开始，每一步梯度下降都是发散的。因此我们需要限制$\nabla^2l(\theta)\preceq MI$，即$l(\theta)$是$M$-Lipschitz smooth的。代入smooth条件有&lt;/p>
+$$
+l(\theta_{k+1})-l(\theta^\star)
+\leq\left\{\frac{\alpha^2M}{2}-\alpha\right\}\|\nabla l(\theta_k)\|^2+l(\theta_k)-l(\theta^\star),
+$$&lt;p>等式右侧对$\alpha$求最小，得$\alpha=1/M$时&lt;/p>
+$$
+l(\theta_{k+1})-l(\theta^\star)
+\leq -\frac{1}{2M}\left\|\nabla l(\theta_k)\right\|^2+l(\theta_k)-l(\theta^\star).
+$$&lt;p>因此当$0 &amp;lt; \alpha &amp;lt; 2/M$时，我们都有$l(\theta_{k+1}) - l(\theta^\star) &amp;lt; l(\theta_k) - l(\theta^\star)$。&lt;/p>
+&lt;p>&lt;strong>要给出收敛速度需要对&lt;/strong>$|\nabla l(\theta_k)|$&lt;strong>给出下界&lt;/strong>。&lt;/p>
+&lt;h4 id="convex情形">Convex情形
+&lt;/h4>$$
+\begin{align}
+&amp;l(\theta^\star)\geq l(\theta_k)+\nabla l(\theta_k)^T(\theta^\star-\theta_k)\\
+\Rightarrow~~&amp; l(\theta_k)-l(\theta^\star)\leq\left\|\nabla l(\theta_k)^T(\theta^\star-\theta_k)\right\|\\
+&amp;~~~~~~~~~~~~~~~~~~~~~\leq\left\|\nabla l(\theta_k)\right\|\left\|\theta_k-\theta^\star\right\|\\
+&amp;~~~~~~~~~~~~~~~~~~~~~\leq\left\|\nabla l(\theta_k)\right\|\left\|\theta_0-\theta^\star\right\|\\
+\Leftrightarrow~~&amp;\|\nabla l(\theta_k)\|\geq\frac{l(\theta_k)-l(\theta^\star)}{\left\|\theta_0-\theta^\star\right\|}
+\end{align}
+$$&lt;p>记$\eta_k=l(\theta_k)-l(\theta^\star)$，并假设$|\theta_0-\theta^\star|\leq R$，有&lt;/p>
+$$
+\begin{align}
+\eta_{k+1} &amp;\leq \eta_k - \frac{1}{2M}\|\nabla l(\theta_k)\|^2\\
+&amp;\leq\eta_k-\frac{\eta_k^2}{2MR^2}
+\end{align}
+$$&lt;p>化简方式是两边除以$\eta_k\eta_{k+1}$，整理得&lt;/p>
+$$
+\begin{align}
+&amp;\frac{1}{\eta_{k+1}}-\frac{1}{\eta_k}\geq\frac{1}{2MR^2}\frac{\eta_k}{\eta_{k+1}}\geq\frac{1}{2MR^2}\\
+\Rightarrow~~&amp;\sum_{i=0}^k\frac{1}{\eta_{i+1}}-\frac{1}{\eta_i}=\frac{1}{\eta_{k+1}}-\frac{1}{\eta_0}\geq\frac{k+1}{2MR^2},
+\end{align}
+$$&lt;p>即&lt;/p>
+$$
+l(\theta_k)-l(\theta^\star)=\eta_k\leq\frac{2MR^2}{k},
+$$&lt;p>因此收敛速度是$O(1/k)$级别的次线性收敛。&lt;/p>
+&lt;h4 id="m-strongly-convex情形">$m$-strongly convex情形
+&lt;/h4>&lt;p>根据强凸定义（参考Lipschitz smooth的几种定义相互的推导）：&lt;/p>
+$$
+\|\nabla l(\theta_k)\|^2 \geq 2m\left(l(\theta_k)-l(\theta^\star)\right)
+$$&lt;p>代入下界有&lt;/p>
+$$
+l(\theta_k)-l(\theta^\star)=\eta_k\leq\left(1-\frac{m}{M}\right)^k\eta_0
+$$&lt;h3 id="stochastic-gradient-descent">Stochastic Gradient Descent
+&lt;/h3>&lt;p>随机情形下，假设$l(\theta)$为凸，记$\theta$处的带噪次梯度为$\tilde g_{\theta}$，并且$\exists B&amp;gt;0, \forall \theta\in\Theta, \mathbb{E}[\left|\tilde g_\theta\right|^2|\theta]\leq B^2$，且假设参数空间有界，即$\forall \theta \in \Theta, |\theta|\leq r$。考虑一般的随机梯度下降，即更新后可能落在可行域外，通过投影得到新的参数估计：&lt;/p>
+$$
+\theta_{k+1} = Proj_\Theta(\theta_k-\alpha \tilde g_{\theta_k})，
+$$&lt;p>因为投影后的向量距离$\Theta$中的任意向量更近，有&lt;/p>
+$$
+\begin{align}
+\|\theta_{k+1}-\theta^\star\|^2 &amp;\leq \|\theta_k-\alpha\tilde g_{\theta_k} -\theta^\star\|^2 \\
+&amp;=\|\theta_k-\theta^\star\|^2 + \alpha^2\|\tilde g_{\theta_k}\|^2-2\alpha\tilde g_{\theta_k}^T(\theta_k-\theta^\star)
+\end{align}
+$$&lt;p>注意到这个式子中有两个随机变量$\theta_k$和$\tilde g_{\theta_k}$，后者依赖前者。因此我们这里对$\tilde g_{\theta_k}$在给定$\theta_k$的情况下求期望：&lt;/p>
+$$
+\begin{align}
+\mathbb{E}_{\tilde g_{\theta_k}}[\|\theta_{k+1}-\theta^\star\|^2|\theta_k] &amp;\leq \|\theta_k-\theta^\star\|^2+ \alpha^2\mathbb{E}[\|\tilde g_{\theta_k}\|^2|\theta_k] - 2\alpha (\theta_k-\theta^\star)^T g_{\theta_k}\\
+&amp;\leq \|\theta_k-\theta^\star\|^2+ \alpha^2B^2 - 2\alpha (\theta_k-\theta^\star)^T g_{\theta_k}\\
+\end{align}
+$$&lt;h4 id="convex情形-1">Convex情形
+&lt;/h4>&lt;p>利用函数的凸性，有&lt;/p>
+$$
+\mathbb{E}_{\tilde g_{\theta_k}}[\|\theta_{k+1}-\theta^\star\|^2|\theta_k] \leq \|\theta_k-\theta^\star\|^2+ \alpha^2B^2 - 2\alpha \{l(\theta_k)-l(\theta^\star)\}
+$$&lt;p>再对$\theta_k$求期望，则之后所有的期望都是对$\tilde g_{\theta_k}$和$\theta_k$求的联合期望，因此下标之后省略。记$\gamma_k = \mathbb{E}[|\theta_{k}-\theta^\star|^2]$，整理有&lt;/p>
+$$
+\begin{align}
+&amp; \mathbb{E}[l(\theta_k)] - l(\theta^\star) \leq \frac{1}{2\alpha} (\gamma_k-\gamma_{k+1}) + \frac{\alpha B^2}{2}\\
+\Rightarrow~~&amp; \sum_{i=0}^k\left\{\mathbb{E}[l(\theta_k)]-l(\theta^\star)\right\} \leq \frac{1}{2\alpha}(\gamma_0-\gamma_{k+1}) + \frac{(k+1)\alpha B^2}{2}\\
+&amp;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\leq \frac{r^2}{2\alpha} + \frac{(k+1)\alpha B^2}{2}
+\end{align}
+$$&lt;p>利用$\min$函数的凹性，并记$k$次迭代中最好的参数为$\theta_{best}$&lt;/p>
+$$
+\begin{align}
+\sum_{i=0}^k\left\{\mathbb{E}[l(\theta_k)]-l(\theta^\star)\right\} &amp;\geq (k+1)\left\{\min_{i=0,\dots,k}\mathbb{E}[l(\theta_i)]-l(\theta^\star)\right\} \\
+&amp;\geq (k+1)\left\{\mathbb{E}[\min_{i=0,\dots,k}l(\theta_i)] - l(\theta^\star)\right\} \\
+&amp; = (k+1)\left\{\mathbb{E}[l(\theta_{best})]-l(\theta^\star)\right\}
+\end{align}
+$$&lt;p>最后不等式右边对$\alpha$求最小，整理得&lt;/p>
+$$
+\mathbb{E}[l(\theta_{best})] - l(\theta^\star) \leq \frac{Br}{\sqrt{k}}
+$$&lt;h4 id="strong-convex情形">Strong Convex情形
+&lt;/h4>&lt;p>强凸情形下用常数步长$\alpha$先把$k$个式子加起来再取最优的$\alpha^\star$并不能达到最优的收敛界。为了使得上界更紧，我们允许步长可变，即每一步有一个步长$\alpha_k$，然后对每个式子都取一个精心构造的步长，最后达到$O(1/K)$的收敛。利用强凸有&lt;/p>
+$$
+\mathbb{E}_{\tilde g_{\theta_k}}[\|\theta_{k+1}-\theta^\star\|^2]\leq(1-\alpha_k m)\|\theta_k-\theta^\star\|^2 + \alpha_k^2B^2-2\alpha\{l(\theta_k)-l(\theta^\star)\}
+$$&lt;p>我们这里不能对$\alpha_k$直接取最优，因为最优值依赖于$|\theta_k-\theta^\star|^2$，而我们不知道$\theta^\star$的具体值。这里&lt;strong>非常精妙&lt;/strong>地构造了一个步长$\alpha_k=1/km$，我还没弄懂怎么想到这样取的。Anyway，代入步长，对$\theta_k$求期望并记$\gamma_k=\mathbb{E}[|\theta_k-\theta^\star|^2],\eta_k=\mathbb{E}[l(\theta_k)-l(\theta^\star)]$有&lt;/p>
+$$
+\begin{align}
+\eta_k \leq \frac{B^2}{2km} + \frac{(k-1)m\gamma_k}{2} - \frac{km\gamma_{k+1}}{2}
+\end{align}
+$$&lt;p>注意到右边最后两项可以被telescope消掉。两边乘以$k$并取telescope sum有&lt;/p>
+$$
+\begin{align}
+&amp;k\cdot\eta_k \leq \frac{B^2}{2m} + \frac{k(k-1)m\gamma_k}{2}-\frac{k^2m\gamma_{k+1}}{2}\\
+&amp;~~~~~~~~~\leq\frac{B^2}{2m}+\frac{k(k-1)m\gamma_k}{2}-\frac{(k+1)km\gamma_{k+1}}{2}\\
+\Rightarrow~~&amp;\sum_{i=1}^{k}i\cdot\eta_i \leq \frac{B^2k}{2m}+ 0 -\frac{(k+1)km\gamma_{k+1}}{2}
+\end{align}
+$$&lt;p>再利用之前的技巧$\eta_i\geq\min_{j=1,\dots,k}\mathbb{E}[l(\theta_j)]-l(\theta^\star)\geq\mathbb{E}[l(\theta_{best})]-l(\theta^\star)$，有&lt;/p>
+$$
+\begin{align}
+&amp;\frac{(k+1)k}{2}\cdot\left\{\mathbb{E}[l(\theta_{best})]-l(\theta^\star)\right\} \leq \frac{B^2k}{2m}-\frac{(k+1)km\gamma_{k+1}}{2}\\
+\Leftrightarrow~~&amp;\mathbb{E}[l(\theta_{best})]-l(\theta^\star)\leq \frac{B^2}{mk}
+\end{align}
+$$</description></item><item><title>隐变量模型总结</title><link>https://fingertap.github.io/p/%E9%9A%90%E5%8F%98%E9%87%8F%E6%A8%A1%E5%9E%8B%E6%80%BB%E7%BB%93/</link><pubDate>Mon, 01 Jul 2019 00:02:20 +0800</pubDate><guid>https://fingertap.github.io/p/%E9%9A%90%E5%8F%98%E9%87%8F%E6%A8%A1%E5%9E%8B%E6%80%BB%E7%BB%93/</guid><description>&lt;img src="https://fingertap.github.io/p/%E9%9A%90%E5%8F%98%E9%87%8F%E6%A8%A1%E5%9E%8B%E6%80%BB%E7%BB%93/cover.png" alt="Featured image of post 隐变量模型总结" />&lt;p>最大似然框架下，假设观测变量有缺失或不可观测的属性时，要用到变分的方法。隐变量模型往往是无监督或者少监督模型，因为监督信息可以看做是包含在缺失的隐变量中的一部分。&lt;/p>
+&lt;p>注意：&lt;/p>
+&lt;ol>
+&lt;li>缺失观测和样本一一对应，而参数则是所有样本共享的。&lt;/li>
+&lt;li>似然下界的输入是参数和变分分布，梯度回带到参数和分布上。&lt;/li>
+&lt;li>不可处理（intractable）的分布定义为无法计算，且无法求导。&lt;/li>
+&lt;/ol>
+&lt;p>假设输入$(x, z)\in\mathcal{D}=\mathcal{X}\times\mathcal{Z}$中$\mathcal{Z}$空间是无法观测到的，那么我们的目标就变为了最大化对数边缘似然&lt;/p>
+$$
+\tag{1}
+\max_{\theta\in\Theta}\log\mathcal{L}(\theta;\mathbf{X})=\sum_{x\in\mathbf{X}}\log p_\theta(x)=\sum_{x\in\mathbf{X}}\log\sum_{z\in\mathcal{Z}}p_{\theta}(x, z),
+$$&lt;p>其中$\mathbf{X}\subset\mathcal{X}$是观测到的数据集。&lt;/p>
+&lt;h2 id="em算法">EM算法
+&lt;/h2>&lt;p>直接在式子$(1)$中对$\theta$求导是不好计算的，因为$\log$中有求和。EM算法的思路是优化$(1)$的下界，&lt;strong>其核心假设是$p_\theta(x, z)$是很好处理的&lt;/strong>。利用$\log$函数的凹性和Jensen不等式：&lt;/p>
+$$
+\tag{2}
+\log\sum_{z\in\mathcal{Z}}p_{\theta}(x, z) = \log\sum_{z\in\mathcal{Z}}\frac{p_{\theta}(x, z)}{q(z)}q(z) \geq \sum_{z\in\mathcal{Z}}q(z)\left\{\log p_\theta(x, z)-\log q(z)\right\},
+$$&lt;p>其中$q(z)$是任意定义在$\mathcal{Z}$上的概率密度函数，且$\forall z \in \mathcal{Z} q(z) &amp;gt; 0$。因此之后优化下界&lt;/p>
+$$
+\max_\theta\hat{\mathcal{L}}(q, \theta;\mathbf{X})=\sum_{x\in\mathcal{X}}\sum_{z\in\mathcal{Z}}q(z)\left\{\log p_\theta(x, z)-\log q(z)\right\}.
+$$&lt;p>这个下界是一个双变量的泛函，一个变量是概率密度$q$，一个变量是参数$\theta$。采用坐标梯度法，交替寻找当前最优的$q$和$\theta$即为EM算法。对$q$取最大要求$(2)$式中等号成立，即要求$\forall z \in \mathcal{Z}, p_\theta(x, z)/q(z)=C$，$C$为某一常数，简单计算一下能得到$C = p_\theta(x)$，而&lt;/p>
+$$
+\tag{E step}
+q^\star(z)=p_{\theta}(z|x)
+$$&lt;p>而我们在M步时往往会遇到$\sum_zq(z)\cdot z$这样的$z$的期望形式，因此在实际实现中，我们往往在内存里记录隐变量的期望&lt;/p>
+$$
+\tag{E step in practice}
+\mathbb{E}[z] = \sum_{z\in\mathcal{Z}}p_\theta(z|x)\cdot z
+$$&lt;p>这也是E步名字的由来。M步得名原因是我们在这一步里对$\theta$求了最大，注意这个下界往往是凹的（大部分模型是对数凹的，比如GMM中的高斯分布等指数族分布），因此更新的方式为&lt;/p>
+$$
+\tag{M step}
+\theta^{new} = \arg\max_\theta\sum_{z\in\mathcal{Z}}p_{\theta^{old}}(z|x)\log p_\theta(x, z)
+$$&lt;p>表示成概率图是这样：&lt;/p>
+&lt;p>&lt;img src="https://fingertap.github.io/p/%E9%9A%90%E5%8F%98%E9%87%8F%E6%A8%A1%E5%9E%8B%E6%80%BB%E7%BB%93/EM_pgm.jpg"
+width="1710"
+height="848"
+srcset="https://fingertap.github.io/p/%E9%9A%90%E5%8F%98%E9%87%8F%E6%A8%A1%E5%9E%8B%E6%80%BB%E7%BB%93/EM_pgm_hu_37689ea88cea9b39.jpg 480w, https://fingertap.github.io/p/%E9%9A%90%E5%8F%98%E9%87%8F%E6%A8%A1%E5%9E%8B%E6%80%BB%E7%BB%93/EM_pgm_hu_3269574e2543dda0.jpg 1024w"
+loading="lazy"
+alt="PGM for EM algorithm"
+class="gallery-image"
+data-flex-grow="201"
+data-flex-basis="483px"
+>&lt;/p>
+&lt;h2 id="变分em">变分EM
+&lt;/h2>&lt;p>变分EM是为了处理全贝叶斯情形下对参数、隐变量的多重积分不可求的问题而发明的。变分（variational）意味着我们要近似一个函数，在一族函数中找一个最能近似目标的。EM算法中的$q(z)$即为一个变分分布，用以近似真实的隐变量后验分布$p_\theta(z|x)$，而变分EM甚至需要对$q(z)$做进一步的近似。&lt;/p>
+&lt;p>EM算法假设我们有参数$\theta$和隐变量$z$要估计。特别地，对于参数$\theta$我们做的是点估计，是最大似然或者最大后验推断。但是在全贝叶斯方法中，我们对$\theta$也会引入先验分布$p(\theta|\alpha)$，并积分掉$\theta$（$\alpha$是超参）。也即现在我们的目标是&lt;/p>
+$$
+\max_\alpha \int p(x|\theta)p(\theta|\alpha) d\theta=\int\int p(x, z|\theta)p(\theta|\alpha)d\theta dz
+$$&lt;p>我们可以把$\theta$吸收到$z$中，形式上其实和$(2)$一致。即便我们用一个变分分布$q(z, \theta)$来近似$p_\alpha(z, \theta|x)$，在EM算法中往往也会涉及到intractable的积分。一个思路是采样这样的积分，用MCMC方法的思路，这样做的缺点是对每个样本都要做一次采样，对于大数据集计算开销相当大。另一种方法是解耦合这样可以分组的隐变量。&lt;/p>
+&lt;p>我们假设$q(z, \theta) = q(z)q(\theta)$，或者更一般地，假设$q(z) = \prod_i q_i(z_i)$，即每组隐变量有自己的变分分布且相互独立。假设这样分解以后，对于每个隐变量组$q_i(z_i)$都是tractable的，记$q_i=q_i(z_i)$，单独提取出$z_j$观察下界$\hat{\mathcal{L}}$有&lt;/p>
+$$
+\begin{align}
+\hat{\mathcal{L}(q)} &amp;= \int \prod_i q_i \left\{\log p(x, z)-\sum_i\log q_i\right\}dz \\
+&amp;=\int \prod_i q_i\log p(x, z)dz-\int\prod_iq_i\sum_{i'}\log q_{i'} dz \\
+&amp;=\int q_j\left\{\int\log p(x, z)\prod_{i\neq j}q_i dz_i \right\}dz_j - \int \prod_{i} q_i\log q_jdz + \int \prod_i q_i\sum_{i'\neq j}\log q_{i'} dz\\
+&amp;= \int q_j \mathbb{E}_{i\neq j}[\log p(x, z)]dz_j - \int q_j\log q_jdz_j + const
+\end{align}
+$$&lt;p>把右侧看做一个KL散度，最优的$q_j$满足&lt;/p>
+$$
+\tag{Variational EM}
+\log q_j^\star(z_j) = \mathbb{E}_{i\neq j}[\log p(x, z)]
+$$&lt;p>注意到更新$z_j$的分布需要用到$i\neq j$的所有分布来算$p(x, z)$，因此不同的隐变量组的更新是相互依赖的。变分EM迭代地固定$i\neq j$来更新某个隐变量$z_j$，直至所有的隐变量组分布收敛。概率图如下：&lt;/p>
+&lt;p>&lt;img src="https://fingertap.github.io/p/%E9%9A%90%E5%8F%98%E9%87%8F%E6%A8%A1%E5%9E%8B%E6%80%BB%E7%BB%93/variational_EM_pgm.jpg"
+width="1236"
+height="936"
+srcset="https://fingertap.github.io/p/%E9%9A%90%E5%8F%98%E9%87%8F%E6%A8%A1%E5%9E%8B%E6%80%BB%E7%BB%93/variational_EM_pgm_hu_8a48df77f773ec61.jpg 480w, https://fingertap.github.io/p/%E9%9A%90%E5%8F%98%E9%87%8F%E6%A8%A1%E5%9E%8B%E6%80%BB%E7%BB%93/variational_EM_pgm_hu_cc478040d61e440e.jpg 1024w"
+loading="lazy"
+alt="PGM for variational EM"
+class="gallery-image"
+data-flex-grow="132"
+data-flex-basis="316px"
+>&lt;/p>
+&lt;h2 id="vae">VAE
+&lt;/h2>&lt;p>变分自编码器（Variational Auto Encoder）也是隐变量的intractability带来的，不同之处是VAE进一步假设，$p_\theta(x, z), p_{\theta}(z|x)$都是intractable的，且变分将$z$分组也不能使得分布变为tractable的，这样的情形是存在的，比如非线性神经网络。因此我们需要更好的变分方式来近似$p_\theta(z|x)$。VAE提出的方案是用一个由$\phi$控制的分布$q_\phi(z|x)$：&lt;/p>
+$$
+\begin{align}
+\tag{3}
+\hat{\mathcal{L}} (\theta, \phi; \mathbf{X}) &amp;= \sum_{x\in\mathcal{X}}\mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x, z)-\log q_\phi(z|x)]\\
+&amp;= \sum_{x\in\mathcal{X}}\sum_{z\in\mathcal{Z}}q_\phi(z|x)\left\{\log p_\theta(x|z)+\log p_\theta(z)-\log q_\phi(z|x)\right\} \\
+\tag{5}
+&amp; = \sum_{x\in\mathcal{X}}\mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x|z)] - \text{KL}\left[q_\phi(z|x)\Vert p_\theta(z)\right]
+\end{align}
+$$&lt;p>其中$q_\phi(z|x)$被理解为编码器（Encoder），将观测样本映射到隐变量空间$\mathcal{Z}$，$p_\theta(x|z)$为解码器，将隐变量映射回观测样本空间$\mathcal{X}$。&lt;/p>
+&lt;p>我们要优化$\hat{\mathcal{L}}$需要对$\theta$和$\phi$求导，其中对$\phi$求导因为期望的存在有几种处理方式。这里看到$\hat{\mathcal{L}}$有$(3)$和$(5)$两种表示，其对$\phi$求导有些问题。&lt;/p>
+&lt;h3 id="monte-carlo-gradient-estimator">Monte Carlo gradient estimator
+&lt;/h3>&lt;p>一般期望对于分布的参数求导可以使用下面的近似&lt;/p>
+$$
+\begin{align}
+\nabla_\phi\mathbb{E}_{q_\phi(z)}[f(z)] &amp;= \int f(z) \nabla_\phi q_\phi(z) dz \\
+&amp;=\int f(z) q_\phi(z) \frac{\nabla_\phi q_\phi(z)}{q_\phi(z)} dz\\
+&amp;=\int f(z)q_\phi(z)\nabla_\phi\log q_\phi(z) dz\\
+&amp;=\mathbb{E}_{q_\phi(z)}[f(z)\nabla_\phi\log q_\phi(z)] \\
+&amp;\simeq \frac{1}{L}\sum_{l=1}^{L}f(z^{(l)})\nabla_\phi\log q_\phi(z^{(l)})
+\end{align}
+$$&lt;p>但是这样得到的近似方差很大，需要较大的$L$来保证一个很好的梯度估计（详见&lt;a class="link" href="https://icml.cc/2012/papers/687.pdf" target="_blank" rel="noopener"
+>这篇文章&lt;/a>）。在$(3)$中我们可以用类似的方式得到$\hat{\mathcal{L}}$对$\phi$的导数，但是较大的$L$使得每个样本的采样代价高，因此在大数据集上没有办法应用。&lt;/p>
+&lt;h3 id="reparameterization-trick-sgvb-estimator">Reparameterization trick (SGVB estimator)
+&lt;/h3>&lt;p>对于式$(3)$中的期望，如果我们对$z$节点进行采样近似以后，再算对$\phi$的导数会得到不正确的结果，因为采样的分布$q_\phi(z|x)$是依赖$\phi$的，概率图如下：&lt;/p>
+&lt;p>&lt;img src="https://fingertap.github.io/p/%E9%9A%90%E5%8F%98%E9%87%8F%E6%A8%A1%E5%9E%8B%E6%80%BB%E7%BB%93/VAE_pgm.jpg"
+width="822"
+height="758"
+srcset="https://fingertap.github.io/p/%E9%9A%90%E5%8F%98%E9%87%8F%E6%A8%A1%E5%9E%8B%E6%80%BB%E7%BB%93/VAE_pgm_hu_b4aad4d3cb62f3d9.jpg 480w, https://fingertap.github.io/p/%E9%9A%90%E5%8F%98%E9%87%8F%E6%A8%A1%E5%9E%8B%E6%80%BB%E7%BB%93/VAE_pgm_hu_cbcbfa9fad28bed6.jpg 1024w"
+loading="lazy"
+alt="PGM for VAE"
+class="gallery-image"
+data-flex-grow="108"
+data-flex-basis="260px"
+>&lt;/p>
+&lt;p>Reparameterization将随机性的来源从$z$转移到另一个辅助的噪声变量$\epsilon$，假设$z=g_\phi(\epsilon, x)$，其中$\epsilon\sim p(\epsilon)$，$(3)$式变为&lt;/p>
+$$
+\begin{align}
+\hat{\mathcal{L}}{}^A(\phi, \theta;\mathbf{X}) &amp;= \sum_{x\in\mathcal{X}}\mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x, z)-\log q_\phi(z|x)] \\
+&amp;=\sum_{x\in\mathcal{X}}\mathbb{E}_{p(\epsilon)}[\log p_\theta(x, g_\phi(\epsilon, x))-\log q_\phi(g_\phi(\epsilon, x)|x)]\\
+&amp;\simeq \sum_{x\in\mathcal{X}}\frac{1}{L}\log p_\theta(x, g_\phi(\epsilon^{(l)}, x))-\log q_\phi(g_\phi(\epsilon^{(l)}, x)|x)
+\end{align}
+$$&lt;p>这样的近似比MC梯度近似有更小的方差，且我们可以直接对损失函数进行近似。SGVB的概率图如下：&lt;/p>
+&lt;p>&lt;img src="https://fingertap.github.io/p/%E9%9A%90%E5%8F%98%E9%87%8F%E6%A8%A1%E5%9E%8B%E6%80%BB%E7%BB%93/SGVB_pgm.jpg"
+width="612"
+height="796"
+srcset="https://fingertap.github.io/p/%E9%9A%90%E5%8F%98%E9%87%8F%E6%A8%A1%E5%9E%8B%E6%80%BB%E7%BB%93/SGVB_pgm_hu_79e5feb37141ef71.jpg 480w, https://fingertap.github.io/p/%E9%9A%90%E5%8F%98%E9%87%8F%E6%A8%A1%E5%9E%8B%E6%80%BB%E7%BB%93/SGVB_pgm_hu_dce0890904a768cd.jpg 1024w"
+loading="lazy"
+alt="PGM for SGVB"
+class="gallery-image"
+data-flex-grow="76"
+data-flex-basis="184px"
+>&lt;/p>
+&lt;h3 id="second-version-sgvb-estimator">Second Version SGVB estimator
+&lt;/h3>&lt;p>$(3)$式可以化简为$(5)$式，若$(5)$式中的KL散度项可以积分（tractable），我们就可以只对$(5)$式中的第一项进行采样近似，相比于最原始的SGVB估计子，因为只对变分下界$\hat{\mathcal{L}}$的一部分近似，方差会更小：&lt;/p>
+$$
+\hat{\mathcal{L}}{}^B(\phi, \theta; \mathbf{X}) = -\text{KL}\left[q_\phi(z|x)\Vert p_\theta(z)\right] + \frac{1}{L}\sum_{l=1}^L\log p_\theta\left(x\middle|g_\phi(\epsilon^{(l)}, x)\right)
+$$&lt;p>最后，整个VAE的过程如下：&lt;/p>
+&lt;p>&lt;img src="https://fingertap.github.io/p/%E9%9A%90%E5%8F%98%E9%87%8F%E6%A8%A1%E5%9E%8B%E6%80%BB%E7%BB%93/VAE_flowchart.jpg"
+width="1699"
+height="420"
+srcset="https://fingertap.github.io/p/%E9%9A%90%E5%8F%98%E9%87%8F%E6%A8%A1%E5%9E%8B%E6%80%BB%E7%BB%93/VAE_flowchart_hu_d2c23aa8928313f1.jpg 480w, https://fingertap.github.io/p/%E9%9A%90%E5%8F%98%E9%87%8F%E6%A8%A1%E5%9E%8B%E6%80%BB%E7%BB%93/VAE_flowchart_hu_2bd7d9fa74e02e8f.jpg 1024w"
+loading="lazy"
+alt="VAE flowchart"
+class="gallery-image"
+data-flex-grow="404"
+data-flex-basis="970px"
+>&lt;/p></description></item></channel></rss>
